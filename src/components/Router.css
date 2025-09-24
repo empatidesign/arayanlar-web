@@ -1,0 +1,298 @@
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0E0E0F 0%, #121315 100%);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+.app-navigation {
+  width: 280px;
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+}
+
+.nav-brand {
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.nav-brand h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.nav-brand span {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.nav-menu {
+  flex: 1;
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  border-radius: 0;
+  position: relative;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.nav-item:hover {
+  background: #1C1D20;
+  color: var(--text);
+  padding-left: 2rem;
+}
+
+.nav-item:hover::before {
+  transform: scaleY(1);
+}
+
+.nav-item.active {
+  background: rgba(164, 134, 61, 0.12);
+  color: var(--primary);
+  padding-left: 2rem;
+}
+
+.nav-item.active::before {
+  transform: scaleY(1);
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+}
+
+.nav-text {
+  font-weight: 600;
+}
+
+.nav-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #1C1D20;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.user-info:hover {
+  background: #202227;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--primary);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #111;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.user-role {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.app-main {
+  flex: 1;
+  margin-left: 280px;
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+  .app-navigation {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+  }
+  
+  .nav-brand {
+    padding: 1rem;
+    border-bottom: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+  }
+  
+  .nav-brand h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+  }
+  
+  .nav-brand span {
+    display: none;
+  }
+  
+  .nav-menu {
+    flex-direction: row;
+    padding: 0;
+    gap: 0;
+    overflow-x: auto;
+    flex: 1;
+  }
+  
+  .nav-item {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 0.75rem;
+    min-width: 80px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  .nav-item:hover,
+  .nav-item.active {
+    padding-left: 0.75rem;
+  }
+  
+  .nav-item::before {
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    width: auto;
+    height: 4px;
+    transform: scaleX(0);
+  }
+  
+  .nav-item:hover::before,
+  .nav-item.active::before {
+    transform: scaleX(1);
+  }
+  
+  .nav-icon {
+    font-size: 1.5rem;
+  }
+  
+  .nav-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .nav-footer {
+    display: none;
+  }
+  
+  .app-main {
+    margin-left: 0;
+    margin-top: 0;
+  }
+  
+  .app-container {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-item {
+    min-width: 60px;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .nav-text {
+    font-size: 0.7rem;
+  }
+  
+  .nav-brand {
+    padding: 0.75rem;
+  }
+  
+  .nav-brand h2 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Smooth transitions for page changes */
+.app-main > * {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar styling for navigation menu on mobile */
+.nav-menu::-webkit-scrollbar {
+  height: 4px;
+}
+
+.nav-menu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.nav-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}

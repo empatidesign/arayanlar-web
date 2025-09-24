@@ -1,0 +1,304 @@
+.brand-manager {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.brand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.brand-header h2 {
+  color: #333;
+  margin: 0;
+  font-size: 24px;
+}
+
+.back-button {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background: #5a6268;
+}
+
+.add-brand-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.add-brand-button:hover {
+  background: #0056b3;
+}
+
+.add-brand-form {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  border: 1px solid #dee2e6;
+}
+
+.add-brand-form h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-group input[type="text"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.image-upload-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.image-upload-input:hover {
+  border-color: #007bff;
+}
+
+.image-preview {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.preview-image {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.save-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.save-button:hover {
+  background: #218838;
+}
+
+.cancel-button {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background: #5a6268;
+}
+
+.brands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.brand-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #e0e0e0;
+}
+
+.brand-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.brand-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.brand-card h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 18px;
+  text-align: center;
+}
+
+.brand-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.edit-button {
+  background: #ffc107;
+  color: #212529;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+  background: #e0a800;
+}
+
+.manage-button {
+  background: #17a2b8;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.manage-button:hover {
+  background: #138496;
+}
+
+.delete-button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+  background: #c82333;
+}
+
+.edit-brand-form {
+  width: 100%;
+}
+
+.edit-brand-form .form-group {
+  margin-bottom: 15px;
+}
+
+.edit-brand-form input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.edit-brand-form .form-buttons {
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.edit-brand-form .save-button,
+.edit-brand-form .cancel-button {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.no-brands {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 18px;
+}
+
+.no-brands p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .brand-manager {
+    padding: 15px;
+  }
+  
+  .brand-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .brands-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+  
+  .brand-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
