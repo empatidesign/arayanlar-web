@@ -107,10 +107,7 @@ const LockScreen = () => {
                     Sign In{" "}
                   </Link>{" "}
                 </p>
-                <p>
-                  © 2021 Veltrix. Crafted with{" "}
-                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
-                </p>
+               
               </div>
             </Col>
           </Row>

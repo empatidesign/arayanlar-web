@@ -112,6 +112,12 @@ import PagesProfile from "pages/Utility/pages-profile";
 // Admin
 import SliderList from "../pages/Admin/SliderList";
 import SliderForm from "../pages/Admin/SliderForm";
+import CategoryList from "../pages/Admin/CategoryList";
+import CategoryForm from "../pages/Admin/CategoryForm";
+import ListingList from "../pages/Admin/ListingList";
+import ListingForm from "../pages/Admin/ListingForm";
+import ProductList from "../pages/Admin/ProductList";
+import ProductForm from "../pages/Admin/ProductForm";
 
 const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
@@ -201,6 +207,14 @@ const userRoutes = [
   { path: "/admin/sliders", component: <SliderList /> },
   { path: "/admin/sliders/add", component: <SliderForm /> },
   { path: "/admin/sliders/edit/:id", component: <SliderForm /> },
+  { path: "/admin/categories", component: <CategoryList /> },
+  { path: "/admin/categories/add", component: <CategoryForm /> },
+  { path: "/admin/categories/edit/:id", component: <CategoryForm /> },
+  { path: "/admin/listings", component: <ListingList /> },
+  { path: "/admin/listings/:id", component: <ListingForm /> },
+  { path: "/admin/products", component: <ProductList /> },
+  { path: "/admin/products/add", component: <ProductForm /> },
+  { path: "/admin/products/edit/:id", component: <ProductForm /> },
 
   // this route should be at the end of all other routes
   { path: "/", component: <Dashboard /> },

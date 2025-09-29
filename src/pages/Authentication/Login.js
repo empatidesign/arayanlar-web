@@ -18,6 +18,10 @@ import { loginUser, apiError } from "../../store/actions";
 // import images
 import logoSm from "../../assets/images/logo-sm.png";
 
+// toastr
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
+
 const Login = props => {
   const dispatch = useDispatch();
 
@@ -36,13 +40,21 @@ const Login = props => {
     }
   }, [user]);
 
+  // Error handling with toast notification
+  useEffect(() => {
+    if (props.error && props.error !== "") {
+      toastr.error(props.error, "Giriş Hatası");
+      dispatch(apiError(""));
+    }
+  }, [props.error, dispatch]);
+
   const validation = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
     initialValues: {
-      email: userLogin.email || "admin@themesbrand.com" || '',
-      password: userLogin.password || "123456" || '',
+      email: userLogin.email || "admin@arayanvar.com" || '',
+      password: userLogin.password || "admin123" || '',
     },
     validationSchema: Yup.object({
       email: Yup.string().required("Please Enter Your User Name"),
@@ -162,10 +174,7 @@ const Login = props => {
                     Signup now{" "}
                   </Link>{" "}
                 </p>
-                <p>
-                  © {new Date().getFullYear()} Veltrix. Crafted with{" "}
-                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
-                </p>
+              
               </div>
             </Col>
           </Row>

@@ -102,11 +102,7 @@ const Register2 = () => {
                         Login{" "}
                       </Link>{" "}
                     </p>
-                    <p>
-                      © {new Date().getFullYear()} Veltrix. Crafted with{" "}
-                      <i className="mdi mdi-heart text-danger"></i> by
-                      Themesbrand
-                    </p>
+               
                   </div>
                 </div>
               </div>

@@ -64,11 +64,7 @@ const EmailVerification2 = () => {
                     </div>
 
                     <div className="mt-4 mt-md-5 text-center">
-                      <p className="mb-0">
-                        © {new Date().getFullYear()} Veltrix. Crafted with{" "}
-                        <i className="mdi mdi-heart text-danger"></i> by
-                        Themesbrand
-                      </p>
+                 
                     </div>
                   </div>
                 </div>

@@ -255,13 +255,7 @@ const RightSidebar = props => {
               <h6 className="text-center">Choose Layouts</h6>
 
               <div className="mb-2">
-                <Link to="//veltrix-v.react.themesbrand.com" target="_blank">
-                  <img
-                    src={layout1}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </Link>
+         
                 <div className="form-check form-switch mb-3">
                   <input
                     type="checkbox"
@@ -285,16 +279,7 @@ const RightSidebar = props => {
               </div>
 
               <div className="mb-2">
-                <Link
-                  to="//veltrix-v-dark.react.themesbrand.com"
-                  target="_blank"
-                >
-                  <img
-                    src={layout2}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </Link>
+              
                 <div className="form-check form-switch mb-3">
                   <input
                     type="checkbox"
@@ -318,16 +303,7 @@ const RightSidebar = props => {
               </div>
 
               <div className="mb-2">
-                <Link
-                  to="//veltrix-v-rtl.react.themesbrand.com"
-                  target="_blank"
-                >
-                  <img
-                    src={layout3}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </Link>
+           
                 <div className="form-check form-switch mb-5">
                   {/* <input
                     type="checkbox"

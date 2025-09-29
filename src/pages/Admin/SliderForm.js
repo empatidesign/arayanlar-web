@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Card, CardBody, Form, FormGroup, Label, Input, Button, Alert } from "reactstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
+import { get, post, put } from "../../helpers/backend_helper";
 
 const SliderForm = () => {
   const navigate = useNavigate();
@@ -38,26 +39,25 @@ const SliderForm = () => {
     }
   }, [id, isEdit]);
 
+  const getAuthToken = () => {
+    const authUser = localStorage.getItem('authUser');
+    if (authUser) {
+      const user = JSON.parse(authUser);
+      return user.token || user.accessToken;
+    }
+    return null;
+  };
+
   const fetchSlider = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sliders/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+      const data = await get(`/api/sliders/${id}`);
+      setFormData({
+        title: data.data.title,
+        category: data.data.category,
+        order_index: data.data.order_index,
+        is_active: data.data.is_active
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setFormData({
-          title: data.data.title,
-          category: data.data.category,
-          order_index: data.data.order_index,
-          is_active: data.data.is_active
-        });
-        setCurrentImage(data.data.image_url);
-      } else {
-        setError('Slider bilgileri yüklenirken hata oluştu.');
-      }
+      setCurrentImage(data.data.image_url);
     } catch (error) {
       console.error('Slider yüklenirken hata:', error);
       setError('Slider bilgileri yüklenirken hata oluştu.');
@@ -109,28 +109,17 @@ const SliderForm = () => {
         formDataToSend.append('image', selectedFile);
       }
 
-      const url = isEdit 
-        ? `${process.env.REACT_APP_API_URL}/api/sliders/${id}`
-        : `${process.env.REACT_APP_API_URL}/api/sliders`;
-
-      const response = await fetch(url, {
-        method: isEdit ? 'PUT' : 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formDataToSend
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess(isEdit ? 'Slider başarıyla güncellendi!' : 'Slider başarıyla eklendi!');
-        setTimeout(() => {
-          navigate('/admin/sliders');
-        }, 2000);
+      let data;
+      if (isEdit) {
+        data = await put(`/api/sliders/${id}`, formDataToSend);
       } else {
-        setError(data.message || 'İşlem sırasında hata oluştu.');
+        data = await post('/api/sliders', formDataToSend);
       }
+
+      setSuccess(isEdit ? 'Slider başarıyla güncellendi!' : 'Slider başarıyla eklendi!');
+      setTimeout(() => {
+        navigate('/admin/sliders');
+      }, 2000);
     } catch (error) {
       console.error('Form gönderilirken hata:', error);
       setError('İşlem sırasında hata oluştu.');
@@ -301,3 +290,44 @@ const SliderForm = () => {
                         </FormGroup>
                       </Col>
                     </Row>
+
+                    <Row>
+                      <Col xs="12">
+                        <div className="d-flex justify-content-end gap-2">
+                          <Button
+                            type="button"
+                            color="secondary"
+                            onClick={() => navigate('/admin/sliders')}
+                            disabled={loading}
+                          >
+                            İptal
+                          </Button>
+                          <Button
+                            type="submit"
+                            color="primary"
+                            disabled={loading}
+                          >
+                            {loading ? (
+                              <>
+                                <i className="mdi mdi-loading mdi-spin me-1"></i>
+                                {isEdit ? 'Güncelleniyor...' : 'Ekleniyor...'}
+                              </>
+                            ) : (
+                              isEdit ? 'Güncelle' : 'Ekle'
+                            )}
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Form>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </div>
+    </React.Fragment>
+  );
+};
+
+export default SliderForm;

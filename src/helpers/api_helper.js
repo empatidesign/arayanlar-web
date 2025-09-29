@@ -1,21 +1,50 @@
 import axios from "axios"
-import accessToken from "./jwt-token-access/accessToken"
-
-//pass new generated access token here
-const token = accessToken
 
 //apply base url for axios
-const API_URL = ""
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000"
 
 const axiosApi = axios.create({
   baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 })
 
-axiosApi.defaults.headers.common["Authorization"] = token
+// Request interceptor to add auth token
+axiosApi.interceptors.request.use(
+  (config) => {
+    const authUser = localStorage.getItem('authUser');
+    if (authUser) {
+      const user = JSON.parse(authUser);
+      // Backend response yapısına göre token'ı data.token'dan al
+      const token = user.data?.token || user.token || user.accessToken;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    
+    // FormData için Content-Type header'ını otomatik ayarla
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 axiosApi.interceptors.response.use(
   response => response,
-  error => Promise.reject(error)
+  error => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem('authUser');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
 )
 
 export async function get(url, config = {}) {
@@ -24,13 +53,13 @@ export async function get(url, config = {}) {
 
 export async function post(url, data, config = {}) {
   return axiosApi
-    .post(url, { ...data }, { ...config })
+    .post(url, data instanceof FormData ? data : { ...data }, { ...config })
     .then(response => response.data)
 }
 
 export async function put(url, data, config = {}) {
   return axiosApi
-    .put(url, { ...data }, { ...config })
+    .put(url, data instanceof FormData ? data : { ...data }, { ...config })
     .then(response => response.data)
 }
 

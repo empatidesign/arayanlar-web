@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Card, CardBody, Button, Table, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from "reactstrap";
 import { Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
+import { get, post, put, del } from "../../helpers/backend_helper";
 
 const SliderList = () => {
   const [sliders, setSliders] = useState([]);
@@ -30,21 +31,9 @@ const SliderList = () => {
 
   const fetchSliders = async () => {
     try {
-      console.log('API URL:', process.env.REACT_APP_API_URL);
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sliders`);
-      
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API Response:', data);
-        setSliders(data.data || []);
-      } else {
-        console.error('API yanıtı başarısız:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.error('Hata detayı:', errorText);
-      }
+      const data = await get('/api/sliders');
+      console.log('API Response:', data);
+      setSliders(data.data || []);
     } catch (error) {
       console.error('Slider listesi yüklenirken hata:', error);
     } finally {
@@ -52,22 +41,16 @@ const SliderList = () => {
     }
   };
 
+
+
   const handleDelete = async () => {
     if (!selectedSlider) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sliders/${selectedSlider.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.ok) {
-        setSliders(sliders.filter(slider => slider.id !== selectedSlider.id));
-        setDeleteModal(false);
-        setSelectedSlider(null);
-      }
+      await del(`/api/sliders/${selectedSlider.id}`);
+      setSliders(sliders.filter(slider => slider.id !== selectedSlider.id));
+      setDeleteModal(false);
+      setSelectedSlider(null);
     } catch (error) {
       console.error('Slider silinirken hata:', error);
     }
@@ -75,25 +58,16 @@ const SliderList = () => {
 
   const toggleStatus = async (slider) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sliders/${slider.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          title: slider.title,
-          category: slider.category,
-          order_index: slider.order_index,
-          is_active: !slider.is_active
-        })
+      await put(`/api/sliders/${slider.id}`, {
+        title: slider.title,
+        category: slider.category,
+        order_index: slider.order_index,
+        is_active: !slider.is_active
       });
 
-      if (response.ok) {
-        setSliders(sliders.map(s => 
-          s.id === slider.id ? { ...s, is_active: !s.is_active } : s
-        ));
-      }
+      setSliders(sliders.map(s => 
+        s.id === slider.id ? { ...s, is_active: !s.is_active } : s
+      ));
     } catch (error) {
       console.error('Slider durumu güncellenirken hata:', error);
     }
@@ -101,20 +75,11 @@ const SliderList = () => {
 
   const updateOrder = async (sliderId, newOrder) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sliders/order`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          orders: [{ id: sliderId, order_index: newOrder }]
-        })
+      await put('/api/sliders/order', {
+        orders: [{ id: sliderId, order_index: newOrder }]
       });
 
-      if (response.ok) {
-        fetchSliders(); // Listeyi yenile
-      }
+      fetchSliders(); // Listeyi yenile
     } catch (error) {
       console.error('Slider sırası güncellenirken hata:', error);
     }
@@ -171,23 +136,10 @@ const SliderList = () => {
       formData.append('is_active', newSlider.is_active);
       formData.append('image', newSlider.image);
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/sliders`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSliders(prev => [...prev, result.data]);
-        resetAddModal();
-        fetchSliders(); // Listeyi yenile
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || 'Slider eklenirken hata oluştu.');
-      }
+      const result = await post('/api/sliders', formData);
+      setSliders(prev => [...prev, result.data]);
+      resetAddModal();
+      fetchSliders(); // Listeyi yenile
     } catch (error) {
       console.error('Slider eklenirken hata:', error);
       alert('Slider eklenirken hata oluştu.');
@@ -270,3 +222,212 @@ const SliderList = () => {
                                 </td>
                                 <td>
                                   <h5 className="font-size-14 mb-1">
+                                    {slider.title}
+                                  </h5>
+                                  <p className="text-muted mb-0">{slider.category}</p>
+                                </td>
+                                <td>{slider.category}</td>
+                                <td>
+                                  <Input
+                                    type="number"
+                                    value={slider.order_index}
+                                    onChange={(e) => updateOrder(slider.id, parseInt(e.target.value))}
+                                    style={{ width: '70px' }}
+                                    min="1"
+                                  />
+                                </td>
+                                <td>
+                                  <Badge
+                                    color={slider.is_active ? "success" : "danger"}
+                                    className="cursor-pointer"
+                                    onClick={() => toggleStatus(slider)}
+                                  >
+                                    {slider.is_active ? "Aktif" : "Pasif"}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  {new Date(slider.created_at).toLocaleDateString('tr-TR')}
+                                </td>
+                                <td>
+                                  <div className="d-flex gap-2">
+                                    <Link
+                                      to={`/admin/slider/edit/${slider.id}`}
+                                      className="btn btn-outline-secondary btn-sm"
+                                    >
+                                      <i className="mdi mdi-pencil"></i>
+                                    </Link>
+                                    <Button
+                                      color="outline-danger"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedSlider(slider);
+                                        setDeleteModal(true);
+                                      }}
+                                    >
+                                      <i className="mdi mdi-delete"></i>
+                                    </Button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="7" className="text-center">
+                                Henüz slider bulunmuyor.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
+                  )}
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Silme Modal */}
+          <Modal isOpen={deleteModal} toggle={() => setDeleteModal(false)}>
+            <ModalHeader toggle={() => setDeleteModal(false)}>
+              Slider Sil
+            </ModalHeader>
+            <ModalBody>
+              <p>Bu slider'ı silmek istediğinizden emin misiniz?</p>
+              {selectedSlider && (
+                <div className="alert alert-warning">
+                  <strong>{selectedSlider.title}</strong> slider'ı kalıcı olarak silinecektir.
+                </div>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <Button color="secondary" onClick={() => setDeleteModal(false)}>
+                İptal
+              </Button>
+              <Button color="danger" onClick={handleDelete}>
+                Sil
+              </Button>
+            </ModalFooter>
+          </Modal>
+
+          {/* Yeni Slider Ekleme Modal */}
+          <Modal isOpen={addModal} toggle={resetAddModal} size="lg">
+            <ModalHeader toggle={resetAddModal}>
+              Yeni Slider Ekle
+            </ModalHeader>
+            <ModalBody>
+              <Form>
+                <Row>
+                  <Col md="6">
+                    <FormGroup>
+                      <Label for="title">Başlık *</Label>
+                      <Input
+                        type="text"
+                        id="title"
+                        name="title"
+                        value={newSlider.title}
+                        onChange={handleInputChange}
+                        placeholder="Slider başlığını girin"
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md="6">
+                    <FormGroup>
+                      <Label for="category">Kategori *</Label>
+                      <Input
+                        type="select"
+                        id="category"
+                        name="category"
+                        value={newSlider.category}
+                        onChange={handleInputChange}
+                      >
+                        <option value="">Kategori seçin</option>
+                        <option value="VASİTA">VASİTA</option>
+                        <option value="EMLAK">EMLAK</option>
+                        <option value="İKİNCİ EL">İKİNCİ EL</option>
+                        <option value="İŞ İLANLARI">İŞ İLANLARI</option>
+                        <option value="HİZMETLER">HİZMETLER</option>
+                        <option value="GENEL">GENEL</option>
+                      </Input>
+                    </FormGroup>
+                  </Col>
+                </Row>
+                
+                <Row>
+                  <Col md="6">
+                    <FormGroup>
+                      <Label for="order_index">Sıra</Label>
+                      <Input
+                        type="number"
+                        id="order_index"
+                        name="order_index"
+                        value={newSlider.order_index}
+                        onChange={handleInputChange}
+                        min="1"
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md="6">
+                    <FormGroup check className="mt-4">
+                      <Input
+                        type="checkbox"
+                        id="is_active"
+                        name="is_active"
+                        checked={newSlider.is_active}
+                        onChange={handleInputChange}
+                      />
+                      <Label check for="is_active">
+                        Aktif
+                      </Label>
+                    </FormGroup>
+                  </Col>
+                </Row>
+
+                <FormGroup>
+                  <Label for="image">Resim *</Label>
+                  <Input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  {imagePreview && (
+                    <div className="mt-3">
+                      <img
+                        src={imagePreview}
+                        alt="Önizleme"
+                        style={{ maxWidth: '200px', maxHeight: '120px', objectFit: 'cover' }}
+                        className="img-thumbnail"
+                      />
+                    </div>
+                  )}
+                </FormGroup>
+              </Form>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="secondary" onClick={resetAddModal}>
+                İptal
+              </Button>
+              <Button 
+                color="primary" 
+                onClick={handleAddSlider}
+                disabled={addLoading}
+              >
+                {addLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Ekleniyor...
+                  </>
+                ) : (
+                  'Ekle'
+                )}
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </div>
+      </div>
+    </React.Fragment>
+  );
+};
+
+export default SliderList;

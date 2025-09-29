@@ -188,6 +188,27 @@ const SidebarContent = props => {
               </Link>
             </li>
 
+            <li>
+              <Link to="/admin/categories" className="waves-effect">
+                <i className="ti-tag"></i>
+                <span>Kategori Yönetimi</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/admin/listings" className="waves-effect">
+                <i className="ti-list"></i>
+                <span>İlan Yönetimi</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/admin/products" className="waves-effect">
+                <i className="ti-package"></i>
+                <span>Ürün Yönetimi</span>
+              </Link>
+            </li>
+
             <li className="menu-title">{props.t("Components")}</li>
 
             <li>

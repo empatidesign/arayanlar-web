@@ -9,7 +9,7 @@ import { getFirebaseBackend } from "../../../helpers/firebase_helper"
 import {
   postFakeProfile,
   postJwtProfile,
-} from "../../../helpers/fakebackend_helper"
+} from "../../../helpers/backend_helper"
 
 const fireBaseBackend = getFirebaseBackend()
 

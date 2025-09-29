@@ -60,7 +60,40 @@ const postJwtRegister = (url, data) => {
 }
 
 // Login Method
-const postJwtLogin = data => post(url.POST_FAKE_JWT_LOGIN, data)
+const postJwtLogin = data => {
+  console.log('JWT Login çağrılıyor:', data);
+  return axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, data)
+    .then(response => {
+      console.log('Login başarılı:', response.data);
+      if (response.status >= 200 && response.status <= 299) {
+        return response.data;
+      }
+      throw response.data;
+    })
+    .catch(err => {
+      console.error('Login hatası:', err);
+      let message;
+      if (err.response && err.response.status) {
+        console.log('Hata response:', err.response.data);
+        switch (err.response.status) {
+          case 404:
+            message = "Sorry! the page you are looking for could not be found";
+            break;
+          case 500:
+            message = "Sorry! something went wrong, please contact our support team";
+            break;
+          case 401:
+            message = "Invalid credentials";
+            break;
+          default:
+            message = err.response.data?.message || "Something went wrong";
+        }
+      } else {
+        message = err.message || "Network error";
+      }
+      throw message;
+    });
+}
 
 // postForgetPwd
 const postJwtForgetPwd = data => post(url.POST_FAKE_JWT_PASSWORD_FORGET, data)

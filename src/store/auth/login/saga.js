@@ -10,7 +10,7 @@ import {
   postFakeLogin,
   postJwtLogin,
   postSocialLogin,
-} from "../../../helpers/fakebackend_helper";
+} from "../../../helpers/backend_helper";
 
 const fireBaseBackend = getFirebaseBackend();
 

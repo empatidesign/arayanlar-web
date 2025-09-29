@@ -82,10 +82,7 @@ const Recoverpw = () => {
                     Sign In here{" "}
                   </Link>{" "}
                 </p>
-                <p className="mb-0">
-                  © {new Date().getFullYear()} Veltrix. Crafted with{" "}
-                  <i className="mdi mdi-heart text-danger"></i> by Themesbrand
-                </p>
+               
               </div>
             </Col>
           </Row>

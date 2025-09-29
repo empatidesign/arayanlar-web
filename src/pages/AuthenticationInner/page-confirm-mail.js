@@ -62,10 +62,6 @@ const ConfirmMail = () => {
                 </CardBody>
               </Card>
               <div className="mt-5 text-center">
-                <p>
-                  © {new Date().getFullYear()} Veltrix. Crafted with{" "}
-                  <i className="mdi mdi-heart text-danger"></i> by Themesbrand
-                </p>
               </div>
             </Col>
           </Row>
