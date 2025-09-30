@@ -17,6 +17,30 @@ import {
 } from "./actions";
 
 /**
+ * Save theme settings to localStorage
+ */
+function saveThemeToLocalStorage(key, value) {
+  try {
+    localStorage.setItem(`theme_${key}`, value);
+  } catch (error) {
+    console.error("Error saving theme to localStorage:", error);
+  }
+}
+
+/**
+ * Load theme settings from localStorage
+ */
+function loadThemeFromLocalStorage(key, defaultValue) {
+  try {
+    const saved = localStorage.getItem(`theme_${key}`);
+    return saved !== null ? saved : defaultValue;
+  } catch (error) {
+    console.error("Error loading theme from localStorage:", error);
+    return defaultValue;
+  }
+}
+
+/**
  * Changes the body attribute
  */
 function changeBodyAttribute(attribute, value) {
@@ -59,6 +83,7 @@ function* changeLayout({ payload: layout }) {
       yield put(changeTopbarThemeAction("light"));
     }
     yield call(changeBodyAttribute, "data-layout", layout);
+    yield call(saveThemeToLocalStorage, "layout", layout);
   } catch (error) { }
 }
 
@@ -75,6 +100,7 @@ function* changeLayoutWidth({ payload: width }) {
       yield put(changeSidebarTypeAction("default"));
       yield call(changeBodyAttribute, "data-layout-size", width);
     }
+    yield call(saveThemeToLocalStorage, "layoutWidth", width);
   } catch (error) { }
 }
 
@@ -85,6 +111,7 @@ function* changeLayoutWidth({ payload: width }) {
 function* changeLeftSidebarTheme({ payload: theme }) {
   try {
     yield call(changeBodyAttribute, "data-sidebar", theme);
+    yield call(saveThemeToLocalStorage, "leftSideBarTheme", theme);
   } catch (error) { }
 }
 
@@ -95,6 +122,7 @@ function* changeLeftSidebarTheme({ payload: theme }) {
 function* changeBodyTheme({ payload: theme }) {
   try {
     yield call(changeBodyAttribute, "data-bs-theme", theme);
+    yield call(saveThemeToLocalStorage, "bodyTheme", theme);
   } catch (error) { }
 }
 
@@ -105,6 +133,7 @@ function* changeBodyTheme({ payload: theme }) {
 function* changeTopbarTheme({ payload: theme }) {
   try {
     yield call(changeBodyAttribute, "data-topbar", theme);
+    yield call(saveThemeToLocalStorage, "topbarTheme", theme);
   } catch (error) { }
 }
 
@@ -145,6 +174,7 @@ function* changeLeftSidebarType({ payload: { sidebarType, isMobile } }) {
           yield call(manageBodyClass, "vertical-collpsed", "remove");
         break;
     }
+    yield call(saveThemeToLocalStorage, "leftSideBarType", sidebarType);
   } catch (error) { }
 }
 

@@ -311,19 +311,9 @@ const RightSidebar = props => {
                     id="rtl-mode-switch"                   
                     onClick={(event) => console.log(event.target.checked)}
                   /> */}
-                  <label className="form-check-label" htmlFor="rtl-mode-switch">
-                    RTL Mode
-                  </label>
+                 
                 </div>
               </div>
-
-              <Link
-                to="#"
-                className="btn btn-primary btn-block mt-3"
-                target="_blank"
-              >
-                <i className="mdi mdi-cart ms-1" /> Purchase Now
-              </Link>
             </div>
           </div>
         </SimpleBar>

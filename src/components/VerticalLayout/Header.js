@@ -105,22 +105,7 @@ const Header = props => {
 
             <div className="d-none d-sm-block">
 
-              <Dropdown
-                isOpen={singlebtn}
-                toggle={() => setSinglebtn(!singlebtn)}
-                className="pt-3 d-inline-block"
-              >
-                <DropdownToggle className="btn btn-secondary" caret>
-                  Create <i className="mdi mdi-chevron-down"></i>
-                </DropdownToggle>
-                <DropdownMenu>
-                  <DropdownItem>Action</DropdownItem>
-                  <DropdownItem>Another action</DropdownItem>
-                  <DropdownItem>Something else here</DropdownItem>
-                  <div className="dropdown-divider"></div>
-                  <DropdownItem>Separated link</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+          
 
             </div>
           </div>
@@ -164,7 +149,6 @@ const Header = props => {
               </DropdownMenu>
             </Dropdown>
 
-            <LanguageDropdown />
 
             <div className="dropdown d-none d-lg-inline-block">
               <button

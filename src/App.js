@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from 'react-router-dom';
 import { connect } from "react-redux";
 
@@ -38,6 +38,52 @@ fakeBackend();
 // initFirebaseBackend(firebaseConfig)
 
 const App = () => {
+  // Theme ayarlarını localStorage'dan yükle ve DOM'a uygula
+  useEffect(() => {
+    const loadThemeFromLocalStorage = () => {
+      try {
+        const savedTheme = localStorage.getItem('arayanvar_theme_settings');
+        if (savedTheme) {
+          const themeSettings = JSON.parse(savedTheme);
+          
+          // Layout type
+          if (themeSettings.layoutType) {
+            document.body.setAttribute("data-layout", themeSettings.layoutType);
+          }
+          
+          // Layout width
+          if (themeSettings.layoutWidth) {
+            document.body.setAttribute("data-layout-width", themeSettings.layoutWidth);
+          }
+          
+          // Left sidebar theme
+          if (themeSettings.leftSideBarTheme) {
+            document.body.setAttribute("data-sidebar", themeSettings.leftSideBarTheme);
+          }
+          
+          // Body theme
+          if (themeSettings.bodyTheme) {
+            document.body.setAttribute("data-bs-theme", themeSettings.bodyTheme);
+          }
+          
+          // Left sidebar type
+          if (themeSettings.leftSideBarType) {
+            document.body.setAttribute("data-sidebar-size", themeSettings.leftSideBarType);
+          }
+          
+          // Topbar theme
+          if (themeSettings.topbarTheme) {
+            document.body.setAttribute("data-topbar", themeSettings.topbarTheme);
+          }
+        }
+      } catch (error) {
+        console.error('Theme ayarları yüklenirken hata oluştu:', error);
+      }
+    };
+
+    loadThemeFromLocalStorage();
+  }, []);
+
   return (
     <React.Fragment>
       <Routes>

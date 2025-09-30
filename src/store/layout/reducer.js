@@ -22,14 +22,27 @@ import {
   topbarTheme,
 } from "constants/layout"
 
+/**
+ * Load theme settings from localStorage
+ */
+function loadThemeFromLocalStorage(key, defaultValue) {
+  try {
+    const saved = localStorage.getItem(`theme_${key}`);
+    return saved !== null ? saved : defaultValue;
+  } catch (error) {
+    console.error("Error loading theme from localStorage:", error);
+    return defaultValue;
+  }
+}
+
 const INIT_STATE = {
-  layoutType: layoutTypes.VERTICAL,
-  layoutWidth: layoutWidth.FLUID,
-  leftSideBarTheme: leftSideBarTheme.DARK,
-  bodyTheme: bodyTheme.LIGHT,
+  layoutType: loadThemeFromLocalStorage("layout", layoutTypes.VERTICAL),
+  layoutWidth: loadThemeFromLocalStorage("layoutWidth", layoutWidth.FLUID),
+  leftSideBarTheme: loadThemeFromLocalStorage("leftSideBarTheme", leftSideBarTheme.DARK),
+  bodyTheme: loadThemeFromLocalStorage("bodyTheme", bodyTheme.LIGHT),
   bodyMode: bodyMode.RTL,
-  leftSideBarType: leftSideBarType.DEFAULT,
-  topbarTheme: topbarTheme.LIGHT,
+  leftSideBarType: loadThemeFromLocalStorage("leftSideBarType", leftSideBarType.DEFAULT),
+  topbarTheme: loadThemeFromLocalStorage("topbarTheme", topbarTheme.LIGHT),
   showRightSidebar: false,
   isMobile: false,
   showSidebar: true,
