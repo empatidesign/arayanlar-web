@@ -192,6 +192,24 @@ const SidebarContent = props => {
             </li>
 
             <li>
+              <Link to="#" className="has-arrow waves-effect">
+                <i className="ti-car"></i>
+                <span>Araba Yönetimi</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/admin/car-brands">Markalar</Link>
+                </li>
+                <li>
+                  <Link to="/admin/car-models">Modeller</Link>
+                </li>
+                <li>
+                  <Link to="/admin/car-listings">Araba İlanları</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
               <Link to="/admin/messages" className="waves-effect">
                 <i className="ti-comment"></i>
                 <span>Mesajlar</span>

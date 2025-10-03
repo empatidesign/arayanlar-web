@@ -137,6 +137,15 @@ export const put = async (url, data, config = {}) => {
   }
 };
 
+export const patch = async (url, data, config = {}) => {
+  try {
+    const response = await axiosApi.patch(url, data, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const del = async (url, config = {}) => {
   try {
     const response = await axiosApi.delete(url, config);
