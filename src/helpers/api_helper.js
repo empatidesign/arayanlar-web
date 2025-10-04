@@ -64,7 +64,13 @@ export async function put(url, data, config = {}) {
 }
 
 export async function del(url, config = {}) {
-  return await axiosApi
+  return axiosApi
     .delete(url, { ...config })
+    .then(response => response.data)
+}
+
+export async function patch(url, data, config = {}) {
+  return axiosApi
+    .patch(url, data, { ...config })
     .then(response => response.data)
 }

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { get, patch } from "../../helpers/backend_helper";
 
-const CarListingsList = () => {
+const WatchListingsList = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -33,7 +33,7 @@ const CarListingsList = () => {
   const [alert, setAlert] = useState({ show: false, message: '', color: 'success' });
 
   // Breadcrumb
-  document.title = "Araba İlanları Yönetimi | Arayanvar Admin";
+  document.title = "Saat İlanları Yönetimi | Arayanvar Admin";
 
   useEffect(() => {
     fetchListings();
@@ -51,7 +51,7 @@ const CarListingsList = () => {
       params.append('limit', pagination.limit);
       
       const queryString = params.toString();
-      const endpoint = `/api/cars/admin/listings${queryString ? '?' + queryString : ''}`;
+      const endpoint = `/api/watches/admin/listings${queryString ? '?' + queryString : ''}`;
       
       const response = await get(endpoint);
       
@@ -80,7 +80,7 @@ const CarListingsList = () => {
 
   const handleApprove = async (listingId) => {
     try {
-      const response = await patch(`/api/cars/admin/listings/${listingId}/approve`);
+      const response = await patch(`/api/watches/admin/listings/${listingId}/approve`);
       
       if (response.success) {
         showAlert('İlan başarıyla onaylandı', 'success');
@@ -94,22 +94,6 @@ const CarListingsList = () => {
     }
   };
 
-  const handleRevertToPending = async (listingId) => {
-    try {
-      const response = await patch(`/api/cars/admin/listings/${listingId}/revert-to-pending`);
-      
-      if (response.success) {
-        showAlert('İlan durumu beklemede olarak değiştirildi', 'success');
-        fetchListings();
-      } else {
-        showAlert(response.message || 'İlan durumu değiştirilirken hata oluştu', 'danger');
-      }
-    } catch (error) {
-      console.error('İlan durumu değiştirilirken hata:', error);
-      showAlert('İlan durumu değiştirilirken hata oluştu', 'danger');
-    }
-  };
-
   const handleRejectSubmit = async () => {
     if (!rejectionReason.trim()) {
       showAlert('Reddetme sebebi yazmalısınız', 'warning');
@@ -119,7 +103,7 @@ const CarListingsList = () => {
     try {
       setRejectLoading(true);
       
-      const response = await patch(`/api/cars/admin/listings/${selectedListing.id}/reject`, {
+      const response = await patch(`/api/watches/admin/listings/${selectedListing.id}/reject`, {
         rejection_reason: rejectionReason
       });
       
@@ -169,35 +153,33 @@ const CarListingsList = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
-  const formatRemainingTime = (expiresAt, status) => {
-    if (!expiresAt || status !== 'approved') return '-';
-    
+  // Kalan süreyi hesapla ve formatla
+  const calculateRemainingTime = (expiresAt, status) => {
+    if (!expiresAt || status !== 'approved') {
+      return status === 'pending' ? 'Onay Bekliyor' : '-';
+    }
+
     const now = new Date();
     const expireDate = new Date(expiresAt);
     const diffTime = expireDate - now;
-    
+
     if (diffTime <= 0) {
-      return <span className="text-danger">Süresi Dolmuş</span>;
+      return <span className="text-danger fw-medium">Süresi Doldu</span>;
     }
-    
+
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) {
-      return <span className="text-warning">1 Gün</span>;
-    } else if (diffDays <= 3) {
-      return <span className="text-warning">{diffDays} Gün</span>;
+    const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+    if (diffDays > 1) {
+      return <span className="text-success fw-medium">{diffDays} gün</span>;
+    } else if (diffHours > 1) {
+      return <span className="text-warning fw-medium">{diffHours} saat</span>;
     } else {
-      return <span className="text-success">{diffDays} Gün</span>;
+      const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+      return <span className="text-danger fw-medium">{diffMinutes} dakika</span>;
     }
   };
 
@@ -220,7 +202,7 @@ const CarListingsList = () => {
     <React.Fragment>
       <div className="page-content">
         <div className="container-fluid">
-          <Breadcrumbs title="Admin" breadcrumbItem="Araba İlanları" />
+          <Breadcrumbs title="Admin" breadcrumbItem="Saat İlanları" />
           
           {alert.show && (
             <Alert color={alert.color} className="mb-3" fade={false}>
@@ -233,7 +215,7 @@ const CarListingsList = () => {
               <Card>
                 <CardBody>
                   <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h4 className="card-title">Araba İlanları Yönetimi</h4>
+                    <h4 className="card-title">Saat İlanları Yönetimi</h4>
                   </div>
 
                   {/* Filters */}
@@ -321,9 +303,13 @@ const CarListingsList = () => {
                                   <td>
                                     {listing.main_image ? (
                                       <img
-                                        src={listing.main_image}
+                                        src={listing.main_image.startsWith('http') ? listing.main_image : `${process.env.REACT_APP_API_URL || 'http://localhost:3000'}${listing.main_image}`}
                                         alt={listing.title}
                                         style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                                        onError={(e) => {
+                                          e.target.style.display = 'none';
+                                          e.target.nextSibling.style.display = 'flex';
+                                        }}
                                       />
                                     ) : (
                                       <div 
@@ -337,14 +323,29 @@ const CarListingsList = () => {
                                           borderRadius: '4px'
                                         }}
                                       >
-                                        <i className="mdi mdi-car text-muted"></i>
+                                        <i className="mdi mdi-watch text-muted"></i>
+                                      </div>
+                                    )}
+                                    {listing.main_image && (
+                                      <div 
+                                        style={{ 
+                                          width: '50px', 
+                                          height: '50px', 
+                                          backgroundColor: '#f8f9fa', 
+                                          display: 'none', 
+                                          alignItems: 'center', 
+                                          justifyContent: 'center',
+                                          borderRadius: '4px'
+                                        }}
+                                      >
+                                        <i className="mdi mdi-watch text-muted"></i>
                                       </div>
                                     )}
                                   </td>
                                   <td>
                                     <div style={{ maxWidth: '200px' }}>
                                       <div className="text-truncate fw-medium">{listing.title}</div>
-                                      <small className="text-muted">{listing.model_year} • {listing.km} km</small>
+                                      <small className="text-muted">{listing.condition} • {listing.case_material}</small>
                                     </div>
                                   </td>
                                   <td>
@@ -360,7 +361,7 @@ const CarListingsList = () => {
                                   </td>
                                   <td>{listing.location_city}</td>
                                   <td>{getStatusBadge(listing.status)}</td>
-                                  <td>{formatRemainingTime(listing.expires_at, listing.status)}</td>
+                                  <td>{calculateRemainingTime(listing.expires_at, listing.status)}</td>
                                   <td>
                                     <div>
                                       <div className="fw-medium">{listing.user_name} {listing.user_surname}</div>
@@ -382,99 +383,49 @@ const CarListingsList = () => {
                                         Detayları Görüntüle
                                       </UncontrolledTooltip>
 
-                                      {listing.status === 'pending' && (
-                                        <>
-                                          <Button
-                                            color="success"
-                                            size="sm"
-                                            onClick={() => handleApprove(listing.id)}
-                                            id={`approve-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-check"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`approve-${listing.id}`}>
-                                            Onayla
-                                          </UncontrolledTooltip>
+                                      {/* Onay butonu - pending ve rejected durumlarında göster */}
+                                       {(listing.status === 'pending' || listing.status === 'rejected') && (
+                                         <>
+                                           <Button
+                                             color="success"
+                                             size="sm"
+                                             onClick={() => handleApprove(listing.id)}
+                                             id={`approve-${listing.id}`}
+                                           >
+                                             <i className="mdi mdi-check"></i>
+                                           </Button>
+                                           <UncontrolledTooltip placement="top" target={`approve-${listing.id}`}>
+                                             {listing.status === 'rejected' ? 'Yeniden Onayla' : 'Onayla'}
+                                           </UncontrolledTooltip>
+                                         </>
+                                       )}
 
-                                          <Button
-                                            color="danger"
-                                            size="sm"
-                                            onClick={() => openRejectModal(listing)}
-                                            id={`reject-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-close"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`reject-${listing.id}`}>
-                                            Reddet
-                                          </UncontrolledTooltip>
-                                        </>
-                                      )}
-
-                                      {listing.status === 'approved' && (
-                                        <>
-                                          <Button
-                                            color="warning"
-                                            size="sm"
-                                            onClick={() => handleRevertToPending(listing.id)}
-                                            id={`revert-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-clock-outline"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`revert-${listing.id}`}>
-                                            Beklemede Yap
-                                          </UncontrolledTooltip>
-
-                                          <Button
-                                            color="danger"
-                                            size="sm"
-                                            onClick={() => openRejectModal(listing)}
-                                            id={`reject-approved-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-close"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`reject-approved-${listing.id}`}>
-                                            Reddet
-                                          </UncontrolledTooltip>
-                                        </>
-                                      )}
-
-                                      {listing.status === 'rejected' && (
-                                        <>
-                                          <Button
-                                            color="success"
-                                            size="sm"
-                                            onClick={() => handleApprove(listing.id)}
-                                            id={`approve-rejected-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-check"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`approve-rejected-${listing.id}`}>
-                                            Onayla
-                                          </UncontrolledTooltip>
-
-                                          <Button
-                                            color="warning"
-                                            size="sm"
-                                            onClick={() => handleRevertToPending(listing.id)}
-                                            id={`revert-rejected-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-clock-outline"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`revert-rejected-${listing.id}`}>
-                                            Beklemede Yap
-                                          </UncontrolledTooltip>
-                                        </>
-                                      )}
+                                       {/* Red butonu - pending ve approved durumlarında göster */}
+                                       {(listing.status === 'pending' || listing.status === 'approved') && (
+                                         <>
+                                           <Button
+                                             color="danger"
+                                             size="sm"
+                                             onClick={() => openRejectModal(listing)}
+                                             id={`reject-${listing.id}`}
+                                           >
+                                             <i className="mdi mdi-close"></i>
+                                           </Button>
+                                           <UncontrolledTooltip placement="top" target={`reject-${listing.id}`}>
+                                             {listing.status === 'approved' ? 'İlanı Reddet' : 'Reddet'}
+                                           </UncontrolledTooltip>
+                                         </>
+                                       )}
                                     </div>
                                   </td>
                                 </tr>
                               ))
                             ) : (
                               <tr>
-                                <td colSpan="10" className="text-center">
-                                  Henüz ilan bulunmuyor
-                                </td>
-                              </tr>
+                                 <td colSpan="11" className="text-center">
+                                   Henüz ilan bulunmuyor
+                                 </td>
+                               </tr>
                             )}
                           </tbody>
                         </Table>
@@ -584,9 +535,10 @@ const CarListingsList = () => {
                       <p><strong>Fiyat:</strong> {formatPrice(selectedListing.price, selectedListing.currency)}</p>
                       <p><strong>Marka:</strong> {selectedListing.brand_name}</p>
                       <p><strong>Model:</strong> {selectedListing.product_name}</p>
-                      <p><strong>Model Yılı:</strong> {selectedListing.model_year}</p>
-                      <p><strong>KM:</strong> {selectedListing.km?.toLocaleString('tr-TR')}</p>
-                      <p><strong>Motor Hacmi:</strong> {selectedListing.engine_size}</p>
+                      <p><strong>Durum:</strong> {selectedListing.condition}</p>
+                      <p><strong>Kasa Malzemesi:</strong> {selectedListing.case_material}</p>
+                      <p><strong>Kasa Çapı:</strong> {selectedListing.case_diameter}mm</p>
+                      <p><strong>Su Geçirmezlik:</strong> {selectedListing.water_resistance}</p>
                       <p><strong>Şehir:</strong> {selectedListing.location_city}</p>
                       <p><strong>Durum:</strong> {getStatusBadge(selectedListing.status)}</p>
                       <p><strong>Oluşturulma:</strong> {formatDate(selectedListing.created_at)}</p>
@@ -635,4 +587,4 @@ const CarListingsList = () => {
   );
 };
 
-export default CarListingsList;
+export default WatchListingsList;

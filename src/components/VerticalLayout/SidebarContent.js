@@ -65,7 +65,7 @@ const SidebarContent = props => {
       }
       if (parent) {
         const parent2El =
-          parent.childNodes && parent.childNodes.lenght && parent.childNodes[1]
+          parent.childNodes && parent.childNodes.length && parent.childNodes[1]
             ? parent.childNodes[1]
             : null;
         if (parent2El && parent2El.id !== "side-menu") {
@@ -114,6 +114,35 @@ const SidebarContent = props => {
     }
     if (matchingMenuItem) {
       activateParentDropdown(matchingMenuItem);
+    }
+
+    // Saat yönetimi sayfalarında saat menüsünü aktif et ve diğer menüyü kapat
+    if (fullPath.includes('/admin/watch-')) {
+      const watchMenuItem = document.getElementById('watch-management-menu');
+      const carMenuItem = document.getElementById('car-management-menu');
+      if (carMenuItem) {
+        // araba menüsünü kapat
+        carMenuItem.classList.remove('mm-active');
+        const carSubMenu = carMenuItem.nextElementSibling;
+        if (carSubMenu) carSubMenu.classList.remove('mm-show');
+      }
+      if (watchMenuItem) {
+        activateParentDropdown(watchMenuItem);
+      }
+    }
+    // Araba yönetimi sayfalarında araba menüsünü aktif et ve diğer menüyü kapat
+    else if (fullPath.includes('/admin/car-')) {
+      const carMenuItem = document.getElementById('car-management-menu');
+      const watchMenuItem = document.getElementById('watch-management-menu');
+      if (watchMenuItem) {
+        // saat menüsünü kapat
+        watchMenuItem.classList.remove('mm-active');
+        const watchSubMenu = watchMenuItem.nextElementSibling;
+        if (watchSubMenu) watchSubMenu.classList.remove('mm-show');
+      }
+      if (carMenuItem) {
+        activateParentDropdown(carMenuItem);
+      }
     }
   }, [path, activateParentDropdown]);
 
@@ -192,7 +221,7 @@ const SidebarContent = props => {
             </li>
 
             <li>
-              <Link to="#" className="has-arrow waves-effect">
+              <Link to="#" className="has-arrow waves-effect" id="car-management-menu">
                 <i className="ti-car"></i>
                 <span>Araba Yönetimi</span>
               </Link>
@@ -205,6 +234,24 @@ const SidebarContent = props => {
                 </li>
                 <li>
                   <Link to="/admin/car-listings">Araba İlanları</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="#" className="has-arrow waves-effect" id="watch-management-menu">
+                <i className="mdi mdi-watch"></i>
+                <span>Saat Yönetimi</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/admin/watch-brands">Markalar</Link>
+                </li>
+                <li>
+                  <Link to="/admin/watch-models">Modeller</Link>
+                </li>
+                <li>
+                  <Link to="/admin/watch-listings">Saat İlanları</Link>
                 </li>
               </ul>
             </li>
