@@ -124,6 +124,8 @@ import CarListingsList from "../pages/Admin/CarListingsList";
 import WatchBrandList from "../pages/Admin/WatchBrandList";
 import WatchModelList from "../pages/Admin/WatchModelList";
 import WatchListingsList from "../pages/Admin/WatchListingsList";
+import DistrictList from "../pages/Admin/DistrictList";
+import DistrictForm from "../pages/Admin/DistrictForm";
 
 const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
@@ -227,6 +229,9 @@ const userRoutes = [
   { path: "/admin/watch-brands", component: <WatchBrandList /> },
   { path: "/admin/watch-models", component: <WatchModelList /> },
   { path: "/admin/watch-listings", component: <WatchListingsList /> },
+  { path: "/admin/districts", component: <DistrictList /> },
+  { path: "/admin/districts/add", component: <DistrictForm /> },
+  { path: "/admin/districts/edit/:id", component: <DistrictForm /> },
 
   // this route should be at the end of all other routes
   { path: "/", component: <Dashboard /> },

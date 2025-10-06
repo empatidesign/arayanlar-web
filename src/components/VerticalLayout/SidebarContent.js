@@ -120,11 +120,18 @@ const SidebarContent = props => {
     if (fullPath.includes('/admin/watch-')) {
       const watchMenuItem = document.getElementById('watch-management-menu');
       const carMenuItem = document.getElementById('car-management-menu');
+      const housingMenuItem = document.getElementById('housing-management-menu');
       if (carMenuItem) {
         // araba menüsünü kapat
         carMenuItem.classList.remove('mm-active');
         const carSubMenu = carMenuItem.nextElementSibling;
         if (carSubMenu) carSubMenu.classList.remove('mm-show');
+      }
+      if (housingMenuItem) {
+        // konut menüsünü kapat
+        housingMenuItem.classList.remove('mm-active');
+        const housingSubMenu = housingMenuItem.nextElementSibling;
+        if (housingSubMenu) housingSubMenu.classList.remove('mm-show');
       }
       if (watchMenuItem) {
         activateParentDropdown(watchMenuItem);
@@ -134,14 +141,42 @@ const SidebarContent = props => {
     else if (fullPath.includes('/admin/car-')) {
       const carMenuItem = document.getElementById('car-management-menu');
       const watchMenuItem = document.getElementById('watch-management-menu');
+      const housingMenuItem = document.getElementById('housing-management-menu');
       if (watchMenuItem) {
         // saat menüsünü kapat
         watchMenuItem.classList.remove('mm-active');
         const watchSubMenu = watchMenuItem.nextElementSibling;
         if (watchSubMenu) watchSubMenu.classList.remove('mm-show');
       }
+      if (housingMenuItem) {
+        // konut menüsünü kapat
+        housingMenuItem.classList.remove('mm-active');
+        const housingSubMenu = housingMenuItem.nextElementSibling;
+        if (housingSubMenu) housingSubMenu.classList.remove('mm-show');
+      }
       if (carMenuItem) {
         activateParentDropdown(carMenuItem);
+      }
+    }
+    // Konut yönetimi sayfalarında konut menüsünü aktif et ve diğer menüyü kapat
+    else if (fullPath.includes('/admin/districts') || fullPath.includes('/admin/housing-')) {
+      const housingMenuItem = document.getElementById('housing-management-menu');
+      const carMenuItem = document.getElementById('car-management-menu');
+      const watchMenuItem = document.getElementById('watch-management-menu');
+      if (carMenuItem) {
+        // araba menüsünü kapat
+        carMenuItem.classList.remove('mm-active');
+        const carSubMenu = carMenuItem.nextElementSibling;
+        if (carSubMenu) carSubMenu.classList.remove('mm-show');
+      }
+      if (watchMenuItem) {
+        // saat menüsünü kapat
+        watchMenuItem.classList.remove('mm-active');
+        const watchSubMenu = watchMenuItem.nextElementSibling;
+        if (watchSubMenu) watchSubMenu.classList.remove('mm-show');
+      }
+      if (housingMenuItem) {
+        activateParentDropdown(housingMenuItem);
       }
     }
   }, [path, activateParentDropdown]);
@@ -252,6 +287,21 @@ const SidebarContent = props => {
                 </li>
                 <li>
                   <Link to="/admin/watch-listings">Saat İlanları</Link>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <Link to="#" className="has-arrow waves-effect" id="housing-management-menu">
+                <i className="mdi mdi-home-city"></i>
+                <span>Konut Yönetimi</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/admin/districts">İlçeler</Link>
+                </li>
+                <li>
+                  <Link to="/admin/housing-listings">Konut İlanları</Link>
                 </li>
               </ul>
             </li>
