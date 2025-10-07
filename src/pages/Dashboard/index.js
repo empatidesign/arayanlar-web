@@ -12,6 +12,9 @@ import { Link } from "react-router-dom";
 //i18n
 import { withTranslation } from "react-i18next";
 
+// Components
+import ListingCountdown from "../../components/ListingCountdown";
+
 const Dashboard = props => {
   const [stats, setStats] = useState({
     users: 0,
@@ -45,6 +48,11 @@ const Dashboard = props => {
           
           {/* İstatistik Kartları */}
           <Row>
+            {/* İlan Verme Durumu */}
+            <Col xl={4} md={6}>
+              <ListingCountdown />
+            </Col>
+            
             <Col xl={3} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
@@ -105,7 +113,7 @@ const Dashboard = props => {
               </Card>
             </Col>
             
-            <Col xl={3} md={6}>
+            <Col xl={2} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
                   <div className="mb-4">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Card, CardBody, Button, Table, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert, UncontrolledTooltip } from "reactstrap";
 import { Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
-import { get, patch } from "../../helpers/backend_helper";
+import { get, patch, del } from "../../helpers/backend_helper";
 
 const CarListingsList = () => {
   const [listings, setListings] = useState([]);
@@ -25,9 +25,11 @@ const CarListingsList = () => {
   // Modal states
   const [rejectModal, setRejectModal] = useState(false);
   const [detailModal, setDetailModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectLoading, setRejectLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   
   // Alert state
   const [alert, setAlert] = useState({ show: false, message: '', color: 'success' });
@@ -149,6 +151,33 @@ const CarListingsList = () => {
   const openDetailModal = (listing) => {
     setSelectedListing(listing);
     setDetailModal(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      setDeleteLoading(true);
+      
+      const response = await del(`/api/cars/admin/listings/${selectedListing.id}`);
+      
+      if (response.success) {
+        showAlert('İlan başarıyla silindi', 'success');
+        setDeleteModal(false);
+        setSelectedListing(null);
+        fetchListings();
+      } else {
+        showAlert(response.message || 'İlan silinirken hata oluştu', 'danger');
+      }
+    } catch (error) {
+      console.error('İlan silinirken hata:', error);
+      showAlert('İlan silinirken hata oluştu', 'danger');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const openDeleteModal = (listing) => {
+    setSelectedListing(listing);
+    setDeleteModal(true);
   };
 
   const getStatusBadge = (status) => {
@@ -413,18 +442,6 @@ const CarListingsList = () => {
                                       {listing.status === 'approved' && (
                                         <>
                                           <Button
-                                            color="warning"
-                                            size="sm"
-                                            onClick={() => handleRevertToPending(listing.id)}
-                                            id={`revert-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-clock-outline"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`revert-${listing.id}`}>
-                                            Beklemede Yap
-                                          </UncontrolledTooltip>
-
-                                          <Button
                                             color="danger"
                                             size="sm"
                                             onClick={() => openRejectModal(listing)}
@@ -451,20 +468,20 @@ const CarListingsList = () => {
                                           <UncontrolledTooltip placement="top" target={`approve-rejected-${listing.id}`}>
                                             Onayla
                                           </UncontrolledTooltip>
-
-                                          <Button
-                                            color="warning"
-                                            size="sm"
-                                            onClick={() => handleRevertToPending(listing.id)}
-                                            id={`revert-rejected-${listing.id}`}
-                                          >
-                                            <i className="mdi mdi-clock-outline"></i>
-                                          </Button>
-                                          <UncontrolledTooltip placement="top" target={`revert-rejected-${listing.id}`}>
-                                            Beklemede Yap
-                                          </UncontrolledTooltip>
                                         </>
                                       )}
+
+                                      <Button
+                                        color="dark"
+                                        size="sm"
+                                        onClick={() => openDeleteModal(listing)}
+                                        id={`delete-${listing.id}`}
+                                      >
+                                        <i className="mdi mdi-delete"></i>
+                                      </Button>
+                                      <UncontrolledTooltip placement="top" target={`delete-${listing.id}`}>
+                                        Sil
+                                      </UncontrolledTooltip>
                                     </div>
                                   </td>
                                 </tr>
@@ -626,6 +643,73 @@ const CarListingsList = () => {
             <ModalFooter>
               <Button color="secondary" onClick={() => setDetailModal(false)}>
                 Kapat
+              </Button>
+            </ModalFooter>
+          </Modal>
+
+          {/* Silme Modal */}
+          <Modal isOpen={deleteModal} toggle={() => setDeleteModal(!deleteModal)}>
+            <ModalHeader toggle={() => setDeleteModal(!deleteModal)}>
+              <i className="mdi mdi-alert-circle-outline text-warning me-2"></i>
+              İlan Silme Onayı
+            </ModalHeader>
+            <ModalBody>
+              <div className="text-center">
+                <i className="mdi mdi-alert-circle-outline text-warning" style={{ fontSize: '48px' }}></i>
+                <h5 className="mt-3 mb-3">Bu işlem geri alınamaz!</h5>
+                <p className="text-muted">
+                  Aşağıdaki ilanı kalıcı olarak silmek istediğinizden emin misiniz?
+                </p>
+                
+                {selectedListing && (
+                  <div className="alert alert-light mt-3">
+                    <div className="d-flex align-items-center">
+                      {selectedListing.main_image && (
+                        <img
+                          src={selectedListing.main_image}
+                          alt={selectedListing.title}
+                          style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                          className="me-3"
+                        />
+                      )}
+                      <div className="text-start">
+                        <div className="fw-bold">{selectedListing.title}</div>
+                        <div className="text-muted small">
+                          {selectedListing.brand_name} {selectedListing.product_name} • {formatPrice(selectedListing.price, selectedListing.currency)}
+                        </div>
+                        <div className="text-muted small">
+                          {selectedListing.user_name} {selectedListing.user_surname}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button 
+                color="secondary" 
+                onClick={() => setDeleteModal(false)}
+                disabled={deleteLoading}
+              >
+                İptal
+              </Button>
+              <Button 
+                color="danger" 
+                onClick={handleDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? (
+                  <>
+                    <i className="mdi mdi-loading mdi-spin me-1"></i>
+                    Siliniyor...
+                  </>
+                ) : (
+                  <>
+                    <i className="mdi mdi-delete me-1"></i>
+                    Sil
+                  </>
+                )}
               </Button>
             </ModalFooter>
           </Modal>

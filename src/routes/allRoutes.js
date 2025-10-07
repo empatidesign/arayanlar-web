@@ -126,6 +126,9 @@ import WatchModelList from "../pages/Admin/WatchModelList";
 import WatchListingsList from "../pages/Admin/WatchListingsList";
 import DistrictList from "../pages/Admin/DistrictList";
 import DistrictForm from "../pages/Admin/DistrictForm";
+import HousingListingsList from "../pages/Admin/HousingListingsList";
+import HousingListingsForm from "../pages/Admin/HousingListingsForm";
+import ListingSchedule from "../pages/Admin/ListingSchedule";
 
 const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
@@ -232,6 +235,9 @@ const userRoutes = [
   { path: "/admin/districts", component: <DistrictList /> },
   { path: "/admin/districts/add", component: <DistrictForm /> },
   { path: "/admin/districts/edit/:id", component: <DistrictForm /> },
+  { path: "/admin/housing-listings", component: <HousingListingsList /> },
+  { path: "/admin/housing-listings/:id", component: <HousingListingsForm /> },
+  { path: "/admin/listing-schedule", component: <ListingSchedule /> },
 
   // this route should be at the end of all other routes
   { path: "/", component: <Dashboard /> },

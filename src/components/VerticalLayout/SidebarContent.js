@@ -316,6 +316,13 @@ const SidebarContent = props => {
             <li className="menu-title">Ayarlar</li>
 
             <li>
+              <Link to="/admin/listing-schedule" className="waves-effect">
+                <i className="ti-time"></i>
+                <span>İlan Zamanlaması</span>
+              </Link>
+            </li>
+
+            <li>
               <Link to="/admin/settings" className="waves-effect">
                 <i className="ti-settings"></i>
                 <span>Genel Ayarlar</span>

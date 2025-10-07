@@ -1,0 +1,67 @@
+.listing-countdown-card {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.countdown-timer {
+  padding: 10px 0;
+}
+
+.countdown-item {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px 5px;
+  margin: 0 2px;
+}
+
+.countdown-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.countdown-label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive tasarım */
+@media (max-width: 768px) {
+  .countdown-number {
+    font-size: 1.2rem;
+  }
+  
+  .countdown-label {
+    font-size: 0.7rem;
+  }
+  
+  .countdown-item {
+    padding: 8px 3px;
+  }
+}
+
+/* Animasyon efektleri */
+.countdown-item {
+  transition: all 0.3s ease;
+}
+
+.countdown-item:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Başarı durumu için özel stiller */
+.bg-success .countdown-item {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Yükleniyor animasyonu */
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}

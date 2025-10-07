@@ -111,7 +111,7 @@ const DistrictForm = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
-    return `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${imagePath}`;
+    return `${process.env.REACT_APP_API_URL}${imagePath}`;
   };
 
   if (loading && isEdit) {
