@@ -129,11 +129,18 @@ import DistrictForm from "../pages/Admin/DistrictForm";
 import HousingListingsList from "../pages/Admin/HousingListingsList";
 import HousingListingsForm from "../pages/Admin/HousingListingsForm";
 import ListingSchedule from "../pages/Admin/ListingSchedule";
+import ListingLimits from "../pages/Admin/ListingLimits";
+
+// User Pages
+import CreateListing from "../pages/CreateListing";
 
 const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
 
-  // //calendar
+  // User Pages
+  { path: "/create-listing", component: <CreateListing /> },
+
+  //calendar
   { path: "/calendar", component: <Calendar /> },
 
   // //profile
@@ -238,6 +245,7 @@ const userRoutes = [
   { path: "/admin/housing-listings", component: <HousingListingsList /> },
   { path: "/admin/housing-listings/:id", component: <HousingListingsForm /> },
   { path: "/admin/listing-schedule", component: <ListingSchedule /> },
+  { path: "/admin/listing-limits", component: <ListingLimits /> },
 
   // this route should be at the end of all other routes
   { path: "/", component: <Dashboard /> },

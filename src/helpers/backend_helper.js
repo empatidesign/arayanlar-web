@@ -201,6 +201,16 @@ export const getCategories = async () => {
   }
 };
 
+// Listing Limits API calls
+export const getUserListingLimit = async () => {
+  try {
+    const response = await axiosApi.get('/api/listing-limits/my-count');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // User management
 export const getLoggedInUser = () => {
   const authUser = localStorage.getItem("authUser");

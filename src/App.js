@@ -16,7 +16,8 @@ import NonAuthLayout from "./components/NonAuthLayout";
 import "./assets/scss/theme.scss";
 
 // Import Firebase Configuration file
-// import { initFirebaseBackend } from "./helpers/firebase_helper"
+// eslint-disable-next-line
+import { initFirebaseBackend } from "./helpers/firebase_helper";
 
 import fakeBackend from "./helpers/AuthType/fakeBackend";
 

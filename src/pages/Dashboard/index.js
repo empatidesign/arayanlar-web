@@ -14,6 +14,8 @@ import { withTranslation } from "react-i18next";
 
 // Components
 import ListingCountdown from "../../components/ListingCountdown";
+import UserLimitCard from "../../components/UserLimitCard";
+import LimitWarning from "../../components/LimitWarning";
 
 const Dashboard = props => {
   const [stats, setStats] = useState({
@@ -46,14 +48,23 @@ const Dashboard = props => {
             </Row>
           </div>
           
+          {/* Limit Uyarısı Modal */}
+          <LimitWarning showModal={true} />
+
           {/* İstatistik Kartları */}
-          <Row>
+          <>
+            <Row>
             {/* İlan Verme Durumu */}
             <Col xl={4} md={6}>
               <ListingCountdown />
             </Col>
             
-            <Col xl={3} md={6}>
+            {/* Kullanıcı İlan Limiti */}
+            <Col xl={4} md={6}>
+              <UserLimitCard />
+            </Col>
+            
+            <Col xl={4} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
                   <div className="mb-4">
@@ -83,7 +94,38 @@ const Dashboard = props => {
               </Card>
             </Col>
             
-            <Col xl={3} md={6}>
+            <Col xl={4} md={6}>
+              <Card className="mini-stat bg-success text-white">
+                <CardBody>
+                  <div className="mb-4">
+                    <div className="float-start mini-stat-img me-4">
+                      <i className="ti-plus font-size-40"></i>
+                    </div>
+                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">
+                      İlan Ver
+                    </h5>
+                    <h4 className="fw-medium font-size-24">
+                      Hemen Başla
+                    </h4>
+                    <div className="mini-stat-label bg-light">
+                      <p className="mb-0 text-success">Yeni İlan</p>
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <div className="float-end">
+                      <Link to="/create-listing" className="text-white-50">
+                        <i className="mdi mdi-arrow-right h5"></i>
+                      </Link>
+                    </div>
+                    <p className="text-white-50 mb-0 mt-1">İlan oluştur</p>
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+            </Row>
+            
+            <Row>
+            <Col xl={4} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
                   <div className="mb-4">
@@ -172,7 +214,8 @@ const Dashboard = props => {
                 </CardBody>
               </Card>
             </Col>
-          </Row>
+            </Row>
+          </>
 
           {/* Hızlı Erişim Kartları */}
           <Row>

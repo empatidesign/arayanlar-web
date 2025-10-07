@@ -323,6 +323,13 @@ const SidebarContent = props => {
             </li>
 
             <li>
+              <Link to="/admin/listing-limits" className="waves-effect">
+                <i className="ti-control-stop"></i>
+                <span>İlan Limitleri</span>
+              </Link>
+            </li>
+
+            <li>
               <Link to="/admin/settings" className="waves-effect">
                 <i className="ti-settings"></i>
                 <span>Genel Ayarlar</span>
