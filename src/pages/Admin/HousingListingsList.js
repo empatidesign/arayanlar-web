@@ -420,11 +420,29 @@ const HousingListingsList = () => {
                               </span>
                             </td>
                             <td>
-                              <div>
-                                <div>{listing.province}</div>
-                                {listing.district && (
-                                  <small className="text-muted">{listing.district}</small>
+                              <div className="d-flex align-items-center">
+                                {listing.district_image && (
+                                  <img
+                                    src={getImageUrl(listing.district_image)}
+                                    alt={listing.district}
+                                    style={{ 
+                                      width: '30px', 
+                                      height: '30px', 
+                                      objectFit: 'cover', 
+                                      borderRadius: '4px',
+                                      marginRight: '8px'
+                                    }}
+                                    onError={(e) => {
+                                      e.target.style.display = 'none';
+                                    }}
+                                  />
                                 )}
+                                <div>
+                                  <div>{listing.province}</div>
+                                  {listing.district && (
+                                    <small className="text-muted">{listing.district}</small>
+                                  )}
+                                </div>
                               </div>
                             </td>
                             <td>
