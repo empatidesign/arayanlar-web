@@ -47,7 +47,7 @@ const SliderList = () => {
     if (!selectedSlider) return;
 
     try {
-      await del(`/api/sliders/${selectedSlider.id}`);
+      await del(`/api/admin/sliders/${selectedSlider.id}`);
       setSliders(sliders.filter(slider => slider.id !== selectedSlider.id));
       setDeleteModal(false);
       setSelectedSlider(null);
@@ -58,7 +58,7 @@ const SliderList = () => {
 
   const toggleStatus = async (slider) => {
     try {
-      await put(`/api/sliders/${slider.id}`, {
+      await put(`/api/admin/sliders/${slider.id}`, {
         title: slider.title,
         category: slider.category,
         order_index: slider.order_index,
@@ -136,7 +136,7 @@ const SliderList = () => {
       formData.append('is_active', newSlider.is_active);
       formData.append('image', newSlider.image);
 
-      const result = await post('/api/sliders', formData);
+      const result = await post('/api/admin/sliders', formData);
       setSliders(prev => [...prev, result.data]);
       resetAddModal();
       fetchSliders(); // Listeyi yenile
@@ -168,7 +168,7 @@ const SliderList = () => {
                         <i className="mdi mdi-plus me-1"></i>
                         Yeni Slider Ekle
                       </Button>
-                      <Link to="/admin/slider/add" className="btn btn-outline-primary">
+                      <Link to="/admin/sliders/add" className="btn btn-outline-primary">
                         <i className="mdi mdi-form-select me-1"></i>
                         Form Sayfası
                       </Link>
@@ -251,7 +251,7 @@ const SliderList = () => {
                                 <td>
                                   <div className="d-flex gap-2">
                                     <Link
-                                      to={`/admin/slider/edit/${slider.id}`}
+                                      to={`/admin/sliders/edit/${slider.id}`}
                                       className="btn btn-outline-secondary btn-sm"
                                     >
                                       <i className="mdi mdi-pencil"></i>

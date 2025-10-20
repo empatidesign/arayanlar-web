@@ -112,9 +112,9 @@ const SliderForm = () => {
 
       let data;
       if (isEdit) {
-        data = await put(`/api/sliders/${id}`, formDataToSend);
+        data = await put(`/api/admin/sliders/${id}`, formDataToSend);
       } else {
-        data = await post('/api/sliders', formDataToSend);
+        data = await post('/api/admin/sliders', formDataToSend);
       }
 
       setSuccess(isEdit ? 'Slider başarıyla güncellendi!' : 'Slider başarıyla eklendi!');

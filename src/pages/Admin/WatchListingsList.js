@@ -26,6 +26,7 @@ const WatchListingsList = () => {
   const [rejectModal, setRejectModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [detailModal, setDetailModal] = useState(false);
+  const [extendDurationModal, setExtendDurationModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectLoading, setRejectLoading] = useState(false);
@@ -156,6 +157,30 @@ const WatchListingsList = () => {
     }
   };
 
+  const handleExtendDuration = async () => {
+    if (!selectedListing) return;
+
+    try {
+      setLoading(true);
+      
+      const response = await patch(`/api/watches/admin/listings/${selectedListing.id}/extend-duration`);
+      
+      if (response.success) {
+        showAlert('İlan süresi başarıyla 7 gün uzatıldı', 'success');
+        setExtendDurationModal(false);
+        setSelectedListing(null);
+        fetchListings();
+      } else {
+        showAlert(response.message || 'İlan süresi uzatılırken hata oluştu', 'danger');
+      }
+    } catch (error) {
+      console.error('İlan süresi uzatılırken hata:', error);
+      showAlert('İlan süresi uzatılırken hata oluştu', 'danger');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openDeleteModal = (listing) => {
     setSelectedListing(listing);
     setDeleteModal(true);
@@ -174,6 +199,8 @@ const WatchListingsList = () => {
         return <Badge color="success">Onaylandı</Badge>;
       case 'rejected':
         return <Badge color="danger">Reddedildi</Badge>;
+      case 'expired':
+        return <Badge color="secondary">Süresi Doldu</Badge>;
       default:
         return <Badge color="secondary">Bilinmiyor</Badge>;
     }
@@ -448,6 +475,26 @@ const WatchListingsList = () => {
                                          </>
                                        )}
 
+                                       {/* Süre uzatma butonu - expired durumundaki ilanlar için */}
+                                       {(listing.status === "approved" && listing.expires_at && new Date(listing.expires_at) <= new Date()) || listing.status === "expired" ? (
+                                         <>
+                                           <Button
+                                             color="info"
+                                             size="sm"
+                                             onClick={() => {
+                                               setSelectedListing(listing);
+                                               setExtendDurationModal(true);
+                                             }}
+                                             id={`extend-${listing.id}`}
+                                           >
+                                             <i className="mdi mdi-plus"></i>
+                                           </Button>
+                                           <UncontrolledTooltip placement="top" target={`extend-${listing.id}`}>
+                                             Süre Uzat (+7 gün)
+                                           </UncontrolledTooltip>
+                                         </>
+                                       ) : null}
+
                                        {/* Silme butonu - tüm durumlar için göster */}
                                        <Button
                                          color="dark"
@@ -688,6 +735,39 @@ const WatchListingsList = () => {
             <ModalFooter>
               <Button color="secondary" onClick={() => setDetailModal(false)}>
                 Kapat
+              </Button>
+            </ModalFooter>
+          </Modal>
+
+          {/* Süre Uzatma Modal */}
+          <Modal isOpen={extendDurationModal} toggle={() => setExtendDurationModal(false)}>
+            <ModalHeader toggle={() => setExtendDurationModal(false)}>
+              İlan Süresini Uzat
+            </ModalHeader>
+            <ModalBody>
+              <p>Bu saat ilanının süresini 7 gün uzatmak istediğinizden emin misiniz?</p>
+              {selectedListing && (
+                <div className="alert alert-info">
+                  <strong>{selectedListing.title}</strong>
+                  <br />
+                  <small>{selectedListing.brand_name} - {selectedListing.product_name}</small>
+                  <br />
+                  <small className="text-muted">
+                    Mevcut bitiş tarihi: {selectedListing.expires_at ? new Date(selectedListing.expires_at).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
+                  </small>
+                </div>
+              )}
+              <div className="alert alert-success">
+                <i className="mdi mdi-information me-2"></i>
+                İlan süresi 7 gün uzatılacak ve durumu "Onaylandı" olarak güncellenecektir.
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="secondary" onClick={() => setExtendDurationModal(false)}>
+                İptal
+              </Button>
+              <Button color="info" onClick={handleExtendDuration} disabled={loading}>
+                {loading ? "Uzatılıyor..." : "Süre Uzat (+7 gün)"}
               </Button>
             </ModalFooter>
           </Modal>

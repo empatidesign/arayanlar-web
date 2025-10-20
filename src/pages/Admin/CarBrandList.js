@@ -76,7 +76,7 @@ const CarBrandList = () => {
     }
 
     try {
-      await del(`/api/cars/brands/${selectedBrand.id}`);
+      await del(`/api/admin/car-brands/${selectedBrand.id}`);
       setBrands(prev => prev.filter(brand => brand.id !== selectedBrand.id));
       setDeleteModal(false);
       setSelectedBrand(null);
@@ -126,8 +126,8 @@ const CarBrandList = () => {
         formData.append('logo', newBrand.image);
       }
 
-      const response = await post('/api/cars/brands', formData);
-      setBrands(prev => [...prev, response]);
+      const response = await post('/api/admin/car-brands', formData);
+      setBrands(prev => [...prev, response.data]);
       setAddModal(false);
       setNewBrand({ name: '', description: '', image: null });
       setImagePreview(null);
@@ -155,8 +155,8 @@ const CarBrandList = () => {
         formData.append('logo', editBrand.image);
       }
 
-      const response = await put(`/api/cars/brands/${editBrand.id}`, formData);
-      setBrands(prev => prev.map(brand => brand.id === editBrand.id ? response : brand));
+      const response = await put(`/api/admin/car-brands/${editBrand.id}`, formData);
+      setBrands(prev => prev.map(brand => brand.id === editBrand.id ? response.data : brand));
       setEditModal(false);
       setEditBrand({ id: '', name: '', description: '', image: null });
       setEditImagePreview(null);

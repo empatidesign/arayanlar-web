@@ -22,6 +22,7 @@ const HousingListingsList = () => {
   const [cancelModal, setCancelModal] = useState(false);
   const [reapproveModal, setReapproveModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [extendDurationModal, setExtendDurationModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
@@ -197,6 +198,29 @@ const HousingListingsList = () => {
     }
   };
 
+  const handleExtendDuration = async () => {
+    if (!selectedListing) return;
+
+    try {
+      setLoading(true);
+      const response = await patch(`/api/housing/admin/listings/${selectedListing.id}/extend-duration`);
+      
+      if (response.success) {
+        setSuccess("Konut ilanı süresi başarıyla uzatıldı (7 gün eklendi)");
+        setExtendDurationModal(false);
+        setSelectedListing(null);
+        fetchListings();
+      } else {
+        setError(response.message || "İlan süresi uzatılırken hata oluştu");
+      }
+    } catch (error) {
+      console.error("İlan süresi uzatılırken hata:", error);
+      setError("İlan süresi uzatılırken hata oluştu");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "approved":
@@ -207,6 +231,8 @@ const HousingListingsList = () => {
         return <Badge color="warning">İptal Edildi</Badge>;
       case "pending":
         return <Badge color="warning">Bekliyor</Badge>;
+      case "expired":
+        return <Badge color="secondary">Süresi Doldu</Badge>;
       default:
         return <Badge color="secondary">{status}</Badge>;
     }
@@ -220,6 +246,33 @@ const HousingListingsList = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "Belirtilmemiş";
     return new Date(dateString).toLocaleDateString("tr-TR");
+  };
+
+  // Kalan süreyi hesapla ve formatla (expires_at alanını kullan)
+  const formatRemainingTime = (expiresAt, status) => {
+    if (!expiresAt || status !== 'approved') {
+      return status === 'pending' ? 'Onay Bekliyor' : '-';
+    }
+
+    const now = new Date();
+    const expireDate = new Date(expiresAt);
+    const diffTime = expireDate - now;
+
+    if (diffTime <= 0) {
+      return <span className="text-danger fw-medium">Süresi Doldu</span>;
+    }
+
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+    if (diffDays > 1) {
+      return <span className="text-success fw-medium">{diffDays} gün</span>;
+    } else if (diffHours > 1) {
+      return <span className="text-warning fw-medium">{diffHours} saat</span>;
+    } else {
+      const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+      return <span className="text-danger fw-medium">{diffMinutes} dakika</span>;
+    }
   };
 
   const getImageUrl = (imagePath) => {
@@ -337,6 +390,7 @@ const HousingListingsList = () => {
                         <th>Konum</th>
                         <th>Kullanıcı</th>
                         <th>Durum</th>
+                        <th>Kalan Süre</th>
                         <th>Tarih</th>
                         <th>İşlemler</th>
                       </tr>
@@ -344,7 +398,7 @@ const HousingListingsList = () => {
                     <tbody>
                       {loading ? (
                         <tr>
-                          <td colSpan="11" className="text-center">
+                          <td colSpan="12" className="text-center">
                             <div className="spinner-border text-primary" role="status">
                               <span className="sr-only">Yükleniyor...</span>
                             </div>
@@ -352,7 +406,7 @@ const HousingListingsList = () => {
                         </tr>
                       ) : listings.length === 0 ? (
                         <tr>
-                          <td colSpan="11" className="text-center">Konut ilanı bulunamadı</td>
+                          <td colSpan="12" className="text-center">Konut ilanı bulunamadı</td>
                         </tr>
                       ) : (
                         listings.map((listing) => (
@@ -454,6 +508,7 @@ const HousingListingsList = () => {
                               </div>
                             </td>
                             <td>{getStatusBadge(listing.status)}</td>
+                            <td>{formatRemainingTime(listing.expires_at, listing.status)}</td>
                             <td>{formatDate(listing.created_at)}</td>
                             <td>
                               <div className="d-flex gap-2">
@@ -539,6 +594,26 @@ const HousingListingsList = () => {
                                     </UncontrolledTooltip>
                                   </>
                                 )}
+
+                                {/* Süre uzatma butonu - expired durumundaki ilanlar için */}
+                                {(listing.status === "approved" && listing.expires_at && new Date(listing.expires_at) <= new Date()) || listing.status === "expired" ? (
+                                  <>
+                                    <Button
+                                      color="info"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedListing(listing);
+                                        setExtendDurationModal(true);
+                                      }}
+                                      id={`extend-${listing.id}`}
+                                    >
+                                      <i className="mdi mdi-plus"></i>
+                                    </Button>
+                                    <UncontrolledTooltip placement="top" target={`extend-${listing.id}`}>
+                                      Süre Uzat (+7 gün)
+                                    </UncontrolledTooltip>
+                                  </>
+                                ) : null}
 
                                 {/* Silme butonu - tüm durumlar için */}
                                 <Button
@@ -754,6 +829,39 @@ const HousingListingsList = () => {
              </Button>
              <Button color="danger" onClick={handleDelete} disabled={loading}>
                {loading ? "Siliniyor..." : "Sil"}
+             </Button>
+           </ModalFooter>
+         </Modal>
+
+         {/* Süre Uzatma Modal */}
+         <Modal isOpen={extendDurationModal} toggle={() => setExtendDurationModal(false)}>
+           <ModalHeader toggle={() => setExtendDurationModal(false)}>
+             İlan Süresini Uzat
+           </ModalHeader>
+           <ModalBody>
+             <p>Bu konut ilanının süresini 7 gün uzatmak istediğinizden emin misiniz?</p>
+             {selectedListing && (
+               <div className="alert alert-info">
+                 <strong>{selectedListing.title}</strong>
+                 <br />
+                 <small>{selectedListing.property_type} - {selectedListing.room_count}</small>
+                 <br />
+                 <small className="text-muted">
+                   Mevcut bitiş tarihi: {selectedListing.expires_at ? new Date(selectedListing.expires_at).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
+                 </small>
+               </div>
+             )}
+             <div className="alert alert-success">
+               <i className="mdi mdi-information me-2"></i>
+               İlan süresi 7 gün uzatılacak ve durumu "Onaylandı" olarak güncellenecektir.
+             </div>
+           </ModalBody>
+           <ModalFooter>
+             <Button color="secondary" onClick={() => setExtendDurationModal(false)}>
+               İptal
+             </Button>
+             <Button color="info" onClick={handleExtendDuration} disabled={loading}>
+               {loading ? "Uzatılıyor..." : "Süre Uzat (+7 gün)"}
              </Button>
            </ModalFooter>
          </Modal>

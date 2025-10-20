@@ -14,6 +14,7 @@ import NonAuthLayout from "./components/NonAuthLayout";
 
 // Import scss
 import "./assets/scss/theme.scss";
+import "./assets/scss/icons.scss";
 
 // Import Firebase Configuration file
 // eslint-disable-next-line

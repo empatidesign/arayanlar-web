@@ -19,6 +19,8 @@ const CarModelList = () => {
     brand_id: '',
     description: '',
     engine_size: '',
+    model_year_start: '',
+    model_year_end: '',
     image: null,
     colors: [],
     is_active: true
@@ -34,6 +36,8 @@ const CarModelList = () => {
     brand_id: '',
     description: '',
     engine_size: '',
+    model_year_start: '',
+    model_year_end: '',
     image: null,
     colors: [],
     is_active: true
@@ -90,10 +94,11 @@ const CarModelList = () => {
 
   const handleToggleStatus = async (modelId, currentStatus) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3000'}/api/cars/models/${modelId}/toggle-status`, {
-        method: 'PATCH',
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3000'}/api/admin/car-models/${modelId}/toggle-status`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
       });
 
@@ -121,7 +126,7 @@ const CarModelList = () => {
     if (!selectedModel) return;
 
     try {
-      await del(`/api/cars/models/${selectedModel.id}`);
+      await del(`/api/admin/car-models/${selectedModel.id}`);
       setModels(prev => prev.filter(model => model.id !== selectedModel.id));
       setDeleteModal(false);
       setSelectedModel(null);
@@ -233,6 +238,10 @@ const CarModelList = () => {
       showAlert('Marka seçimi gereklidir', 'danger');
       return;
     }
+    if (!newModel.model_year_start) {
+      showAlert('Başlangıç yılı gereklidir', 'danger');
+      return;
+    }
 
     try {
       setAddLoading(true);
@@ -241,6 +250,10 @@ const CarModelList = () => {
       formData.append('brand_id', newModel.brand_id);
       formData.append('description', newModel.description);
       formData.append('engine_size', newModel.engine_size);
+      formData.append('model_year_start', newModel.model_year_start);
+      if (newModel.model_year_end) {
+        formData.append('model_year_end', newModel.model_year_end);
+      }
       formData.append('is_active', newModel.is_active !== undefined ? newModel.is_active : true);
       
       // Add colors data
@@ -273,13 +286,13 @@ const CarModelList = () => {
         formData.append('image', newModel.image);
       }
 
-      const response = await post('/api/cars/models', formData);
+      const response = await post('/api/admin/car-models', formData);
       
       // Backend'den dönen response yapısına göre data'yı al
-      const newModelData = response.success ? response.data : response;
+      const newModelData = response.data;
       setModels(prev => [...prev, newModelData]);
       setAddModal(false);
-      setNewModel({ name: '', brand_id: '', description: '', engine_size: '', image: null, colors: [], is_active: true });
+      setNewModel({ name: '', brand_id: '', description: '', engine_size: '', model_year_start: '', model_year_end: '', image: null, colors: [], is_active: true });
       setImagePreview(null);
       showAlert('Model başarıyla eklendi');
     } catch (error) {
@@ -299,6 +312,10 @@ const CarModelList = () => {
       showAlert('Marka seçimi gereklidir', 'danger');
       return;
     }
+    if (!editModel.model_year_start) {
+      showAlert('Başlangıç yılı gereklidir', 'danger');
+      return;
+    }
 
     try {
       setEditLoading(true);
@@ -307,6 +324,10 @@ const CarModelList = () => {
       formData.append('brand_id', editModel.brand_id);
       formData.append('description', editModel.description);
       formData.append('engine_size', editModel.engine_size);
+      formData.append('model_year_start', editModel.model_year_start);
+      if (editModel.model_year_end) {
+        formData.append('model_year_end', editModel.model_year_end);
+      }
       formData.append('is_active', editModel.is_active !== undefined ? editModel.is_active : true);
       
       // Add colors data
@@ -339,10 +360,10 @@ const CarModelList = () => {
         formData.append('image', editModel.image);
       }
 
-      const response = await put(`/api/cars/models/${editModel.id}`, formData);
+      const response = await put(`/api/admin/car-models/${editModel.id}`, formData);
       
       // Backend'den dönen response yapısına göre data'yı al
-      const updatedModelData = response.success ? response.data : response;
+      const updatedModelData = response.data;
       setModels(prev => prev.map(model => model.id === editModel.id ? updatedModelData : model));
       setEditModal(false);
       setEditModel({ id: '', name: '', brand_id: '', description: '', engine_size: '', image: null, colors: [], is_active: true });
@@ -383,6 +404,8 @@ const CarModelList = () => {
       brand_id: model.brand_id,
       description: model.description || '',
       engine_size: model.engine_size || '',
+      model_year_start: model.model_year_start || '',
+      model_year_end: model.model_year_end || '',
       image: null,
       colors: existingColors,
       is_active: model.is_active !== undefined ? model.is_active : true
@@ -565,6 +588,37 @@ const CarModelList = () => {
                     Birden fazla motor hacmi için virgül ile ayırın (örn: 1.6, 2.0, 2.5)
                   </small>
                 </FormGroup>
+                
+                <Row>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label for="modelYearStart">Başlangıç Yılı *</Label>
+                      <Input
+                        type="number"
+                        id="modelYearStart"
+                        value={newModel.model_year_start}
+                        onChange={(e) => setNewModel(prev => ({ ...prev, model_year_start: e.target.value }))}
+                        placeholder="Başlangıç yılını girin"
+                        min="1900"
+                        max="2030"
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label for="modelYearEnd">Bitiş Yılı</Label>
+                      <Input
+                        type="number"
+                        id="modelYearEnd"
+                        value={newModel.model_year_end}
+                        onChange={(e) => setNewModel(prev => ({ ...prev, model_year_end: e.target.value }))}
+                        placeholder="Bitiş yılını girin (opsiyonel)"
+                        min="1900"
+                        max="2030"
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
                 <FormGroup>
                   <Label for="modelName">Model Adı *</Label>
                   <Input
@@ -765,6 +819,37 @@ const CarModelList = () => {
                     Birden fazla motor hacmi için virgül ile ayırın (örn: 1.6, 2.0, 2.5)
                   </small>
                 </FormGroup>
+                
+                <Row>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label for="editModelYearStart">Başlangıç Yılı *</Label>
+                      <Input
+                        type="number"
+                        id="editModelYearStart"
+                        value={editModel.model_year_start}
+                        onChange={(e) => setEditModel(prev => ({ ...prev, model_year_start: e.target.value }))}
+                        placeholder="Başlangıç yılını girin"
+                        min="1900"
+                        max="2030"
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label for="editModelYearEnd">Bitiş Yılı</Label>
+                      <Input
+                        type="number"
+                        id="editModelYearEnd"
+                        value={editModel.model_year_end}
+                        onChange={(e) => setEditModel(prev => ({ ...prev, model_year_end: e.target.value }))}
+                        placeholder="Bitiş yılını girin (opsiyonel)"
+                        min="1900"
+                        max="2030"
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
                 <FormGroup>
                   <Label for="editModelName">Model Adı *</Label>
                   <Input

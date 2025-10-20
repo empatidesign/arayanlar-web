@@ -32,13 +32,21 @@ const WatchModelList = () => {
   const fetchModels = async () => {
     try {
       setLoading(true);
+      console.log('Fetching models...');
       const response = await get('/api/watches/models');
+      console.log('Models response:', response);
+      
       if (response.success) {
-        setModels(response.data);
+        console.log('Models data:', response.models);
+        setModels(response.models || []);
+      } else {
+        console.error('Response not successful:', response);
+        setModels([]);
       }
     } catch (error) {
       console.error('Saat modelleri yüklenirken hata:', error);
       showAlert('Saat modelleri yüklenirken hata oluştu', 'danger');
+      setModels([]); // Hata durumunda boş array set et
     } finally {
       setLoading(false);
     }
@@ -168,6 +176,10 @@ const WatchModelList = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('Form submit başladı, editModal:', editModal);
+    console.log('FormData:', formData);
+    console.log('SelectedModel:', selectedModel);
+    
     if (!formData.brand_id || !formData.name.trim()) {
       showAlert('Marka ve model adı gerekli', 'danger');
       return;
@@ -214,19 +226,25 @@ const WatchModelList = () => {
 
       let response;
       if (editModal) {
+        console.log('PUT isteği gönderiliyor, URL:', `/api/watches/models/${selectedModel.id}`);
         response = await put(`/api/watches/models/${selectedModel.id}`, submitData);
       } else {
+        console.log('POST isteği gönderiliyor');
         response = await post('/api/watches/models', submitData);
       }
+
+      console.log('API Response:', response);
 
       if (response.success) {
         showAlert(
           editModal ? 'Saat modeli başarıyla güncellendi' : 'Saat modeli başarıyla eklendi',
           'success'
         );
+        console.log('Başarılı, fetchModels çağrılıyor...');
         fetchModels();
         resetForm();
       } else {
+        console.error('API response başarısız:', response);
         showAlert(response.message || 'İşlem başarısız', 'danger');
       }
     } catch (error) {
