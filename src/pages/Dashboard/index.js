@@ -52,22 +52,21 @@ const Dashboard = props => {
           <LimitWarning showModal={true} />
 
           {/* İstatistik Kartları */}
-          <>
-            <Row>
+          <Row className="mb-4">
             {/* İlan Verme Durumu */}
-            <Col xl={4} md={6}>
+            <Col xl={4} md={6} className="mb-3">
               <ListingCountdown />
             </Col>
             
             {/* Kullanıcı İlan Limiti */}
-            <Col xl={4} md={6}>
+            <Col xl={4} md={6} className="mb-3">
               <UserLimitCard />
             </Col>
             
-            <Col xl={4} md={6}>
-              <Card className="mini-stat bg-primary text-white">
-                <CardBody>
-                  <div className="mb-4">
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="mini-stat bg-primary text-white h-100">
+                <CardBody className="d-flex flex-column">
+                  <div className="mb-4 flex-grow-1">
                     <div className="float-start mini-stat-img me-4">
                       <i className="ti-user font-size-40"></i>
                     </div>
@@ -82,7 +81,7 @@ const Dashboard = props => {
                       <p className="mb-0">Toplam</p>
                     </div>
                   </div>
-                  <div className="pt-2">
+                  <div className="pt-2 mt-auto">
                     <div className="float-end">
                       <Link to="/admin/users" className="text-white-50">
                         <i className="mdi mdi-arrow-right h5"></i>
@@ -93,42 +92,13 @@ const Dashboard = props => {
                 </CardBody>
               </Card>
             </Col>
+          </Row>
             
-            <Col xl={4} md={6}>
-              <Card className="mini-stat bg-success text-white">
-                <CardBody>
-                  <div className="mb-4">
-                    <div className="float-start mini-stat-img me-4">
-                      <i className="ti-plus font-size-40"></i>
-                    </div>
-                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">
-                      İlan Ver
-                    </h5>
-                    <h4 className="fw-medium font-size-24">
-                      Hemen Başla
-                    </h4>
-                    <div className="mini-stat-label bg-light">
-                      <p className="mb-0 text-success">Yeni İlan</p>
-                    </div>
-                  </div>
-                  <div className="pt-2">
-                    <div className="float-end">
-                      <Link to="/create-listing" className="text-white-50">
-                        <i className="mdi mdi-arrow-right h5"></i>
-                      </Link>
-                    </div>
-                    <p className="text-white-50 mb-0 mt-1">İlan oluştur</p>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-            </Row>
-            
-            <Row>
-            <Col xl={4} md={6}>
-              <Card className="mini-stat bg-primary text-white">
-                <CardBody>
-                  <div className="mb-4">
+          <Row className="mb-4">
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="mini-stat bg-primary text-white h-100">
+                <CardBody className="d-flex flex-column">
+                  <div className="mb-4 flex-grow-1">
                     <div className="float-start mini-stat-img me-4">
                       <i className="ti-list font-size-40"></i>
                     </div>
@@ -143,7 +113,7 @@ const Dashboard = props => {
                       <p className="mb-0">Toplam</p>
                     </div>
                   </div>
-                  <div className="pt-2">
+                  <div className="pt-2 mt-auto">
                     <div className="float-end">
                       <Link to="/admin/listings" className="text-white-50">
                         <i className="mdi mdi-arrow-right h5"></i>
@@ -155,10 +125,10 @@ const Dashboard = props => {
               </Card>
             </Col>
             
-            <Col xl={2} md={6}>
-              <Card className="mini-stat bg-primary text-white">
-                <CardBody>
-                  <div className="mb-4">
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="mini-stat bg-primary text-white h-100">
+                <CardBody className="d-flex flex-column">
+                  <div className="mb-4 flex-grow-1">
                     <div className="float-start mini-stat-img me-4">
                       <i className="ti-comment font-size-40"></i>
                     </div>
@@ -173,7 +143,7 @@ const Dashboard = props => {
                       <p className="mb-0">Toplam</p>
                     </div>
                   </div>
-                  <div className="pt-2">
+                  <div className="pt-2 mt-auto">
                     <div className="float-end">
                       <Link to="/chat" className="text-white-50">
                         <i className="mdi mdi-arrow-right h5"></i>
@@ -185,10 +155,10 @@ const Dashboard = props => {
               </Card>
             </Col>
             
-            <Col xl={3} md={6}>
-              <Card className="mini-stat bg-primary text-white">
-                <CardBody>
-                  <div className="mb-4">
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="mini-stat bg-primary text-white h-100">
+                <CardBody className="d-flex flex-column">
+                  <div className="mb-4 flex-grow-1">
                     <div className="float-start mini-stat-img me-4">
                       <i className="ti-tag font-size-40"></i>
                     </div>
@@ -203,7 +173,7 @@ const Dashboard = props => {
                       <p className="mb-0">Toplam</p>
                     </div>
                   </div>
-                  <div className="pt-2">
+                  <div className="pt-2 mt-auto">
                     <div className="float-end">
                       <Link to="/admin/categories" className="text-white-50">
                         <i className="mdi mdi-arrow-right h5"></i>
@@ -214,122 +184,88 @@ const Dashboard = props => {
                 </CardBody>
               </Card>
             </Col>
-            </Row>
-          </>
-
-          {/* Hızlı Erişim Kartları */}
-          <Row>
-            <Col xl={4} md={6}>
-              <Card>
-                <CardBody className="text-center">
-                  <div className="py-4">
-                    <i className="ti-plus display-4 text-primary"></i>
-                    <h5 className="text-primary mt-4">Yeni İlan Ekle</h5>
-                    <p className="text-muted">
-                      Sisteme yeni ilan eklemek için tıklayın
-                    </p>
-                    <div className="mt-4">
-                      <Link to="/admin/listings/add" className="btn btn-primary">
-                        İlan Ekle
-                      </Link>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-            
-            <Col xl={4} md={6}>
-              <Card>
-                <CardBody className="text-center">
-                  <div className="py-4">
-                    <i className="ti-settings display-4 text-success"></i>
-                    <h5 className="text-success mt-4">Kategori Yönetimi</h5>
-                    <p className="text-muted">
-                      Kategorileri düzenlemek için tıklayın
-                    </p>
-                    <div className="mt-4">
-                      <Link to="/admin/categories" className="btn btn-success">
-                        Kategoriler
-                      </Link>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-            
-            <Col xl={4} md={6}>
-              <Card>
-                <CardBody className="text-center">
-                  <div className="py-4">
-                    <i className="ti-image display-4 text-warning"></i>
-                    <h5 className="text-warning mt-4">Slider Yönetimi</h5>
-                    <p className="text-muted">
-                      Ana sayfa slider'larını yönetmek için tıklayın
-                    </p>
-                    <div className="mt-4">
-                      <Link to="/admin/sliders" className="btn btn-warning">
-                        Slider'lar
-                      </Link>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
           </Row>
 
-          {/* Son Aktiviteler */}
-          <Row>
-            <Col xl={12}>
-              <Card>
-                <CardBody>
-                  <h4 className="card-title mb-4">Son Aktiviteler</h4>
-                  <div className="table-responsive">
-                    <table className="table table-hover table-centered table-nowrap mb-0">
-                      <thead>
-                        <tr>
-                          <th scope="col">Tarih</th>
-                          <th scope="col">Aktivite</th>
-                          <th scope="col">Kullanıcı</th>
-                          <th scope="col">Durum</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Bugün</td>
-                          <td>Yeni ilan eklendi</td>
-                          <td>Admin</td>
-                          <td>
-                            <span className="badge bg-success">Başarılı</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Dün</td>
-                          <td>Kategori güncellendi</td>
-                          <td>Admin</td>
-                          <td>
-                            <span className="badge bg-info">Güncellendi</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>2 gün önce</td>
-                          <td>Slider eklendi</td>
-                          <td>Admin</td>
-                          <td>
-                            <span className="badge bg-success">Başarılı</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+          {/* Hızlı Erişim Kartları */}
+          <Row className="mb-4">
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="h-100">
+                <CardBody className="text-center d-flex flex-column">
+                  <div className="py-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <i className="ti-plus display-4 text-primary mb-4"></i>
+                    <h5 className="text-primary mt-2 mb-3">Yeni İlan Ekle</h5>
+                    <p className="text-muted mb-4">
+                      Sisteme yeni ilan eklemek için tıklayın
+                    </p>
                   </div>
-                  <div className="text-center mt-3">
-                    <Link to="/admin/logs" className="btn btn-outline-primary">
-                      Tüm Aktiviteleri Görüntüle
+                  <div className="mt-auto">
+                    <Link to="/admin/listings/add" className="btn btn-primary">
+                      İlan Ekle
+                    </Link>
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+            
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="h-100">
+                <CardBody className="text-center d-flex flex-column">
+                  <div className="py-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <i className="ti-settings display-4 text-success mb-4"></i>
+                    <h5 className="text-success mt-2 mb-3">Kategori Yönetimi</h5>
+                    <p className="text-muted mb-4">
+                      Kategorileri düzenlemek için tıklayın
+                    </p>
+                  </div>
+                  <div className="mt-auto">
+                    <Link to="/admin/categories" className="btn btn-success">
+                      Kategoriler
+                    </Link>
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+            
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="h-100">
+                <CardBody className="text-center d-flex flex-column">
+                  <div className="py-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <i className="ti-image display-4 text-warning mb-4"></i>
+                    <h5 className="text-warning mt-2 mb-3">Slider Yönetimi</h5>
+                    <p className="text-muted mb-4">
+                      Ana sayfa slider'larını yönetmek için tıklayın
+                    </p>
+                  </div>
+                  <div className="mt-auto">
+                    <Link to="/admin/sliders" className="btn btn-warning">
+                      Slider'lar
+                    </Link>
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+            
+            <Col xl={4} md={6} className="mb-3">
+              <Card className="h-100">
+                <CardBody className="text-center d-flex flex-column">
+                  <div className="py-4 flex-grow-1 d-flex flex-column justify-content-center">
+                    <i className="ti-user display-4 text-info mb-4"></i>
+                    <h5 className="text-info mt-2 mb-3">Kullanıcı Yönetimi</h5>
+                    <p className="text-muted mb-4">
+                      Kullanıcıları yönetmek için tıklayın
+                    </p>
+                  </div>
+                  <div className="mt-auto">
+                    <Link to="/admin/users" className="btn btn-info">
+                      Kullanıcılar
                     </Link>
                   </div>
                 </CardBody>
               </Card>
             </Col>
           </Row>
+
+        
         </Container>
       </div>
     </React.Fragment>

@@ -44,7 +44,7 @@ const CategoryList = () => {
     if (!selectedCategory) return;
 
     try {
-      await del(`/api/sections/${selectedCategory.id}`);
+      await del(`/api/admin/sections/${selectedCategory.id}`);
       setCategories(prev => prev.filter(cat => cat.id !== selectedCategory.id));
       setDeleteModal(false);
       setSelectedCategory(null);
@@ -117,7 +117,7 @@ const CategoryList = () => {
         formData.append('image', newCategory.image);
       }
 
-      const result = await post('/api/sections', formData);
+      const result = await post('/api/admin/sections', formData);
       if (result.success) {
         setCategories(prev => [...prev, result.section]);
         resetAddModal();

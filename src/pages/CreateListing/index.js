@@ -167,7 +167,7 @@ const CreateListing = () => {
                     Limit bilgisi yükleniyor...
                   </div>
                 ) : limitError ? (
-                  <Alert color="warning" className="mb-0">
+                  <Alert color="warning" className="mb-0" fade timeout={3000}>
                     <i className="mdi mdi-alert-circle me-2"></i>
                     {limitError}
                     <Button 

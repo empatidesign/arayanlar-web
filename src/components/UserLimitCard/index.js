@@ -33,8 +33,8 @@ const UserLimitCard = () => {
 
   if (loading) {
     return (
-      <Card className="mini-stat bg-info text-white">
-        <CardBody className="text-center">
+      <Card className="mini-stat bg-info text-white h-100">
+        <CardBody className="text-center d-flex flex-column justify-content-center">
           <Spinner color="light" size="sm" className="me-2" />
           <span>Limit bilgisi yükleniyor...</span>
         </CardBody>
@@ -44,8 +44,8 @@ const UserLimitCard = () => {
 
   if (error) {
     return (
-      <Card className="mini-stat bg-warning text-white">
-        <CardBody>
+      <Card className="mini-stat bg-warning text-white h-100">
+        <CardBody className="d-flex flex-column justify-content-center">
           <div className="mb-2">
             <i className="ti-alert font-size-24 float-start me-3"></i>
             <h6 className="font-size-14 text-uppercase mt-0 text-white-50">
@@ -73,9 +73,9 @@ const UserLimitCard = () => {
   };
 
   return (
-    <Card className={`mini-stat bg-${getStatusColor()} text-white`}>
-      <CardBody>
-        <div className="mb-4">
+    <Card className={`mini-stat bg-${getStatusColor()} text-white h-100`}>
+      <CardBody className="d-flex flex-column">
+        <div className="mb-4 flex-grow-1">
           <div className="float-start mini-stat-img me-4">
             <i className="ti-clipboard font-size-40"></i>
           </div>
@@ -93,7 +93,7 @@ const UserLimitCard = () => {
             </p>
           </div>
         </div>
-        <div className="pt-2">
+        <div className="pt-2 mt-auto">
           <div className="float-end">
             <i className="mdi mdi-refresh h5 cursor-pointer" 
                onClick={fetchLimitData} 

@@ -155,9 +155,9 @@ const CategoryForm = () => {
 
       let result;
       if (isEdit) {
-        result = await put(`/api/sections/${id}`, submitFormData);
+        result = await put(`/api/admin/sections/${id}`, submitFormData);
       } else {
-        result = await post('/api/sections', submitFormData);
+        result = await post('/api/admin/sections', submitFormData);
       }
 
       if (result.success) {

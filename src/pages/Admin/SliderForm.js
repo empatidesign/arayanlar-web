@@ -43,7 +43,8 @@ const SliderForm = () => {
     const authUser = localStorage.getItem('authUser');
     if (authUser) {
       const user = JSON.parse(authUser);
-      return user.token || user.accessToken;
+      // Backend response yapısına göre token'ı data.token'dan al
+      return user.data?.token || user.token || user.accessToken;
     }
     return null;
   };

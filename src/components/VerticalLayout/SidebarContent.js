@@ -227,12 +227,7 @@ const SidebarContent = props => {
               </Link>
             </li>
 
-            <li>
-              <Link to="/admin/listings" className="waves-effect">
-                <i className="ti-list"></i>
-                <span>İlanlar</span>
-              </Link>
-            </li>
+            
 
             <li>
               <Link to="/admin/categories" className="waves-effect">
@@ -248,12 +243,7 @@ const SidebarContent = props => {
               </Link>
             </li>
 
-            <li>
-              <Link to="/admin/products" className="waves-effect">
-                <i className="ti-package"></i>
-                <span>Ürünler</span>
-              </Link>
-            </li>
+          
 
             <li>
               <Link to="#" className="has-arrow waves-effect" id="car-management-menu">
@@ -306,12 +296,7 @@ const SidebarContent = props => {
               </ul>
             </li>
 
-            <li>
-              <Link to="/admin/messages" className="waves-effect">
-                <i className="ti-comment"></i>
-                <span>Mesajlar</span>
-              </Link>
-            </li>
+          
 
             <li className="menu-title">Ayarlar</li>
 
@@ -329,19 +314,7 @@ const SidebarContent = props => {
               </Link>
             </li>
 
-            <li>
-              <Link to="/admin/settings" className="waves-effect">
-                <i className="ti-settings"></i>
-                <span>Genel Ayarlar</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/admin/reports" className="waves-effect">
-                <i className="ti-bar-chart"></i>
-                <span>Raporlar</span>
-              </Link>
-            </li>
+            
           </ul>
         </div>
       </SimpleBar>
