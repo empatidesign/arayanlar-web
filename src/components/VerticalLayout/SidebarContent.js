@@ -227,6 +227,13 @@ const SidebarContent = props => {
               </Link>
             </li>
 
+            <li>
+              <Link to="/admin/reports" className="waves-effect">
+                <i className="ti-flag"></i>
+                <span>Şikayetler</span>
+              </Link>
+            </li>
+
             
 
             <li>

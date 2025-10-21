@@ -131,6 +131,7 @@ import HousingListingsForm from "../pages/Admin/HousingListingsForm";
 import ListingSchedule from "../pages/Admin/ListingSchedule";
 import ListingLimits from "../pages/Admin/ListingLimits";
 import UserManagement from "../pages/Admin/UserManagement";
+import ReportsList from "../pages/Admin/ReportsList";
 
 // User Pages
 import CreateListing from "../pages/CreateListing";
@@ -248,6 +249,7 @@ const userRoutes = [
   { path: "/admin/listing-schedule", component: <ListingSchedule /> },
   { path: "/admin/listing-limits", component: <ListingLimits /> },
   { path: "/admin/users", component: <UserManagement /> },
+  { path: "/admin/reports", component: <ReportsList /> },
 
   // this route should be at the end of all other routes
   { path: "/", component: <Dashboard /> },

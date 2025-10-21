@@ -44,7 +44,19 @@ const UserManagement = () => {
   // Modal state
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [banModal, setBanModal] = useState(false);
+  const [unbanModal, setUnbanModal] = useState(false);
+  const [banHistoryModal, setBanHistoryModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  
+  // Ban state
+  const [banData, setBanData] = useState({
+    reason: '',
+    banType: 'temporary',
+    banDuration: 24
+  });
+  const [banHistory, setBanHistory] = useState([]);
+  const [userBanStatus, setUserBanStatus] = useState(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -131,6 +143,8 @@ const UserManagement = () => {
       console.log('Users array:', data.data?.users);
       console.log('Users array length:', data.data?.users ? data.data.users.length : 'undefined');
       console.log('First user profile_image_url:', data.data?.users?.[0]?.profile_image_url);
+      console.log('First user is_banned:', data.data?.users?.[0]?.is_banned);
+      console.log('All users ban status:', data.data?.users?.map(u => ({ id: u.id, name: u.name, is_banned: u.is_banned })));
       
       setUsers(data.data?.users || []);
       setTotalPages(data.data?.pagination?.totalPages || 1);
@@ -323,6 +337,29 @@ const UserManagement = () => {
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
+  // Ban süresini hesapla ve formatla
+  const formatBanDuration = (createdAt, bannedUntil) => {
+    if (!bannedUntil) return 'Kalıcı';
+    
+    const startDate = new Date(createdAt);
+    const endDate = new Date(bannedUntil);
+    const durationMs = endDate.getTime() - startDate.getTime();
+    const durationHours = Math.round(durationMs / (1000 * 60 * 60));
+    
+    if (durationHours < 24) {
+      return `${durationHours} saat`;
+    } else if (durationHours < 24 * 7) {
+      const days = Math.round(durationHours / 24);
+      return `${days} gün`;
+    } else if (durationHours < 24 * 30) {
+      const weeks = Math.round(durationHours / (24 * 7));
+      return `${weeks} hafta`;
+    } else {
+      const months = Math.round(durationHours / (24 * 30));
+      return `${months} ay`;
+    }
+  };
+
   // Profil resmi seçme fonksiyonu
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
@@ -386,6 +423,190 @@ const UserManagement = () => {
       console.error('Image upload error:', error);
       throw error;
     }
+  };
+
+  // Ban işlemleri
+  const banUser = async () => {
+    try {
+      const authUser = localStorage.getItem('authUser');
+      if (!authUser) {
+        setError('Yetkilendirme token\'ı bulunamadı');
+        return;
+      }
+      
+      const user = JSON.parse(authUser);
+      const token = user.data?.token || user.token || user.accessToken;
+      
+      if (!token) {
+        setError('Yetkilendirme token\'ı bulunamadı');
+        return;
+      }
+
+      const banPayload = {
+        reason: banData.reason,
+        banType: banData.banType,
+        banDuration: banData.banType === 'temporary' ? banData.banDuration : null
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/admin/ban-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          ...banPayload
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Kullanıcı banlanamadı');
+      }
+
+      setSuccess('Kullanıcı başarıyla banlandı');
+      setBanModal(false);
+      setBanData({ reason: '', banType: 'temporary', banDuration: 24 });
+      fetchUsers();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message || 'Ban işlemi sırasında hata oluştu');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  const unbanUser = async () => {
+    try {
+      const authUser = localStorage.getItem('authUser');
+      if (!authUser) {
+        setError('Yetkilendirme token\'ı bulunamadı');
+        return;
+      }
+      
+      const user = JSON.parse(authUser);
+      const token = user.data?.token || user.token || user.accessToken;
+      
+      if (!token) {
+        setError('Yetkilendirme token\'ı bulunamadı');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/admin/unban-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ban kaldırılamadı');
+      }
+
+      setSuccess('Kullanıcının banı başarıyla kaldırıldı');
+      setUnbanModal(false);
+      fetchUsers();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message || 'Ban kaldırma işlemi sırasında hata oluştu');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  const checkUserBanStatus = async (userId) => {
+    try {
+      const authUser = localStorage.getItem('authUser');
+      if (!authUser) return null;
+      
+      const user = JSON.parse(authUser);
+      const token = user.data?.token || user.token || user.accessToken;
+      
+      if (!token) return null;
+
+      const response = await fetch(`${API_BASE_URL}/api/admin/check-ban-status/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) return null;
+
+      const data = await response.json();
+      return data.data;
+    } catch (err) {
+      console.error('Ban durumu kontrol edilemedi:', err);
+      return null;
+    }
+  };
+
+  const getUserBanHistory = async (userId) => {
+    try {
+      const authUser = localStorage.getItem('authUser');
+      if (!authUser) {
+        setError('Yetkilendirme token\'ı bulunamadı');
+        return;
+      }
+      
+      const user = JSON.parse(authUser);
+      const token = user.data?.token || user.token || user.accessToken;
+      
+      if (!token) {
+        setError('Yetkilendirme token\'ı bulunamadı');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/admin/ban-history/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ban geçmişi getirilemedi');
+      }
+
+      const data = await response.json();
+      setBanHistory(data.data || []);
+    } catch (err) {
+      setError(err.message || 'Ban geçmişi getirilirken hata oluştu');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  // Ban modal açma fonksiyonları
+  const openBanModal = async (user) => {
+    setSelectedUser(user);
+    const banStatus = await checkUserBanStatus(user.id);
+    setUserBanStatus(banStatus);
+    setBanModal(true);
+  };
+
+  const openUnbanModal = (user) => {
+    setSelectedUser(user);
+    setUnbanModal(true);
+  };
+
+  const openBanHistoryModal = async (user) => {
+    setSelectedUser(user);
+    await getUserBanHistory(user.id);
+    setBanHistoryModal(true);
+  };
+
+  // Ban form input değişikliklerini handle et
+  const handleBanInputChange = (e) => {
+    const { name, value } = e.target;
+    setBanData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -465,6 +686,7 @@ const UserManagement = () => {
                           <th>Telefon</th>
                           <th>Rol</th>
                           <th>Şehir</th>
+                          <th>Durum</th>
                           <th>Kayıt Tarihi</th>
                           <th>İşlemler</th>
                         </tr>
@@ -472,14 +694,14 @@ const UserManagement = () => {
                       <tbody>
                         {loading ? (
                           <tr>
-                            <td colSpan="8" className="text-center py-4">
+                            <td colSpan="9" className="text-center py-4">
                               <Spinner color="primary" />
                               <div className="mt-2">Yükleniyor...</div>
                             </td>
                           </tr>
                         ) : users.length === 0 ? (
                           <tr>
-                            <td colSpan="8" className="text-center py-4">
+                            <td colSpan="9" className="text-center py-4">
                               Kullanıcı bulunamadı
                             </td>
                           </tr>
@@ -549,6 +771,14 @@ const UserManagement = () => {
                                 </Badge>
                               </td>
                               <td>{user.city || '-'}</td>
+                              <td>
+                                <Badge 
+                                  color={user.is_banned ? 'danger' : 'success'} 
+                                  className="font-size-12"
+                                >
+                                  {user.is_banned ? 'Yasaklı' : 'Aktif'}
+                                </Badge>
+                              </td>
                               <td>{formatDate(user.created_at)}</td>
                               <td>
                                 <div className="d-flex gap-2">
@@ -562,6 +792,41 @@ const UserManagement = () => {
                                   </Button>
                                   <UncontrolledTooltip placement="top" target={`edit-${user.id}`}>
                                     Düzenle
+                                  </UncontrolledTooltip>
+
+                                  {user.is_banned ? (
+                                    <Button
+                                      color="success"
+                                      size="sm"
+                                      onClick={() => openUnbanModal(user)}
+                                      id={`unban-${user.id}`}
+                                    >
+                                      <i className="mdi mdi-check-circle"></i>
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      color="warning"
+                                      size="sm"
+                                      onClick={() => openBanModal(user)}
+                                      id={`ban-${user.id}`}
+                                    >
+                                      <i className="mdi mdi-block-helper"></i>
+                                    </Button>
+                                  )}
+                                  <UncontrolledTooltip placement="top" target={user.is_banned ? `unban-${user.id}` : `ban-${user.id}`}>
+                                    {user.is_banned ? 'Ban Kaldır' : 'Ban'}
+                                  </UncontrolledTooltip>
+
+                                  <Button
+                                    color="secondary"
+                                    size="sm"
+                                    onClick={() => openBanHistoryModal(user)}
+                                    id={`history-${user.id}`}
+                                  >
+                                    <i className="mdi mdi-history"></i>
+                                  </Button>
+                                  <UncontrolledTooltip placement="top" target={`history-${user.id}`}>
+                                    Ban Geçmişi
                                   </UncontrolledTooltip>
 
                                   <Button
@@ -919,28 +1184,179 @@ const UserManagement = () => {
              </ModalFooter>
            </Modal>
 
-          {/* Delete Modal */}
-          <Modal isOpen={deleteModal} toggle={() => setDeleteModal(false)}>
-            <ModalHeader toggle={() => setDeleteModal(false)}>
-              Kullanıcı Sil
-            </ModalHeader>
-            <ModalBody>
-              <p>
-                <strong>{selectedUser?.name} {selectedUser?.surname}</strong> kullanıcısını silmek istediğinizden emin misiniz?
-              </p>
-              <p className="text-muted">
-                Bu işlem geri alınamaz ve kullanıcının tüm verileri silinecektir.
-              </p>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="secondary" onClick={() => setDeleteModal(false)}>
-                İptal
-              </Button>
-              <Button color="danger" onClick={deleteUser}>
-                Sil
-              </Button>
-            </ModalFooter>
-          </Modal>
+           {/* Delete Modal */}
+           <Modal isOpen={deleteModal} toggle={() => setDeleteModal(false)}>
+             <ModalHeader toggle={() => setDeleteModal(false)}>
+               Kullanıcı Sil
+             </ModalHeader>
+             <ModalBody>
+               <p>
+                 <strong>{selectedUser?.name} {selectedUser?.surname}</strong> kullanıcısını silmek istediğinizden emin misiniz?
+               </p>
+               <p className="text-muted">
+                 Bu işlem geri alınamaz ve kullanıcının tüm verileri silinecektir.
+               </p>
+             </ModalBody>
+             <ModalFooter>
+               <Button color="secondary" onClick={() => setDeleteModal(false)}>
+                 İptal
+               </Button>
+               <Button color="danger" onClick={deleteUser}>
+                 Sil
+               </Button>
+             </ModalFooter>
+           </Modal>
+
+           {/* Ban Modal */}
+           <Modal isOpen={banModal} toggle={() => setBanModal(false)}>
+             <ModalHeader toggle={() => setBanModal(false)}>
+               Kullanıcı Ban
+             </ModalHeader>
+             <ModalBody>
+               {userBanStatus && userBanStatus.is_active ? (
+                 <Alert color="warning">
+                   Bu kullanıcı zaten banlanmış durumda. 
+                   {userBanStatus.banned_until ? 
+                     ` Ban süresi: ${formatBanDuration(userBanStatus.created_at, userBanStatus.banned_until)}` : 
+                     ' Kalıcı ban.'
+                   }
+                 </Alert>
+               ) : null}
+               
+               <Form>
+                 <FormGroup>
+                   <Label>Ban Sebebi *</Label>
+                   <Input
+                     type="textarea"
+                     name="reason"
+                     value={banData.reason}
+                     onChange={handleBanInputChange}
+                     placeholder="Ban sebebini açıklayın..."
+                     rows="3"
+                     required
+                   />
+                 </FormGroup>
+                 
+                 <FormGroup>
+                   <Label>Ban Türü *</Label>
+                   <Input
+                     type="select"
+                     name="banType"
+                     value={banData.banType}
+                     onChange={handleBanInputChange}
+                   >
+                     <option value="temporary">Geçici Ban</option>
+                     <option value="permanent">Kalıcı Ban</option>
+                   </Input>
+                 </FormGroup>
+                 
+                 {banData.banType === 'temporary' && (
+                   <FormGroup>
+                     <Label>Ban Süresi (Saat) *</Label>
+                     <Input
+                       type="number"
+                       name="banDuration"
+                       value={banData.banDuration}
+                       onChange={handleBanInputChange}
+                       min="1"
+                       max="8760"
+                       placeholder="Saat cinsinden ban süresi"
+                     />
+                     <small className="text-muted">
+                       Maksimum 8760 saat (1 yıl) ban verebilirsiniz.
+                     </small>
+                   </FormGroup>
+                 )}
+               </Form>
+               
+               <p className="text-muted mt-3">
+                 <strong>{selectedUser?.name} {selectedUser?.surname}</strong> kullanıcısını banlamak istediğinizden emin misiniz?
+               </p>
+             </ModalBody>
+             <ModalFooter>
+               <Button color="secondary" onClick={() => setBanModal(false)}>
+                 İptal
+               </Button>
+               <Button 
+                 color="warning" 
+                 onClick={banUser}
+                 disabled={!banData.reason.trim()}
+               >
+                 Ban Uygula
+               </Button>
+             </ModalFooter>
+           </Modal>
+
+           {/* Unban Modal */}
+           <Modal isOpen={unbanModal} toggle={() => setUnbanModal(false)}>
+             <ModalHeader toggle={() => setUnbanModal(false)}>
+               Ban Kaldır
+             </ModalHeader>
+             <ModalBody>
+               <p>
+                 <strong>{selectedUser?.name} {selectedUser?.surname}</strong> kullanıcısının banını kaldırmak istediğinizden emin misiniz?
+               </p>
+               <p className="text-muted">
+                 Bu işlem kullanıcının uygulamaya tekrar erişim sağlamasına olanak tanır.
+               </p>
+             </ModalBody>
+             <ModalFooter>
+               <Button color="secondary" onClick={() => setUnbanModal(false)}>
+                 İptal
+               </Button>
+               <Button color="success" onClick={unbanUser}>
+                 Ban Kaldır
+               </Button>
+             </ModalFooter>
+           </Modal>
+
+           {/* Ban History Modal */}
+           <Modal isOpen={banHistoryModal} toggle={() => setBanHistoryModal(false)} size="lg">
+             <ModalHeader toggle={() => setBanHistoryModal(false)}>
+               Ban Geçmişi - {selectedUser?.name} {selectedUser?.surname}
+             </ModalHeader>
+             <ModalBody>
+               {banHistory.length === 0 ? (
+                 <p className="text-center text-muted">Bu kullanıcının ban geçmişi bulunmamaktadır.</p>
+               ) : (
+                 <div className="table-responsive">
+                   <Table className="table table-centered table-nowrap mb-0">
+                     <thead className="table-light">
+                       <tr>
+                         <th>Tarih</th>
+                         <th>Sebep</th>
+                         <th>Süre</th>
+                         <th>Banlayan</th>
+                         <th>Durum</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {banHistory.map((ban, index) => (
+                         <tr key={index}>
+                           <td>{formatDate(ban.created_at)}</td>
+                           <td>{ban.reason}</td>
+                           <td>
+                             {formatBanDuration(ban.created_at, ban.banned_until)}
+                           </td>
+                           <td>{ban.banned_by_name || 'Sistem'}</td>
+                           <td>
+                             <Badge color={ban.is_active ? 'danger' : 'success'}>
+                               {ban.is_active ? 'Aktif' : 'Sona Erdi'}
+                             </Badge>
+                           </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </Table>
+                 </div>
+               )}
+             </ModalBody>
+             <ModalFooter>
+               <Button color="secondary" onClick={() => setBanHistoryModal(false)}>
+                 Kapat
+               </Button>
+             </ModalFooter>
+           </Modal>
         </Container>
       </div>
     </React.Fragment>
