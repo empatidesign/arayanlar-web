@@ -87,7 +87,15 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build ",
+    "build": "react-scripts build",
+    "build:prod": "NODE_ENV=production react-scripts build",
+    "serve": "serve -s build -l 3000",
+    "deploy": "bash deploy.sh",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop arayanvar-web",
+    "pm2:restart": "pm2 restart arayanvar-web",
+    "pm2:logs": "pm2 logs arayanvar-web",
+    "pm2:status": "pm2 status",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,jsx,json,md,html,css,less,scss}\"",
     "test": "react-scripts test",
@@ -144,6 +152,7 @@
   "devDependencies": {
     "eslint-config-standard-react": "^9.2.0",
     "eslint-plugin-react": "^7.20.6",
-    "prettier": "^2.1.1"
+    "prettier": "^2.1.1",
+    "serve": "^14.2.3"
   }
 }
