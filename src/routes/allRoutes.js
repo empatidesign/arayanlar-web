@@ -133,6 +133,8 @@ import ListingLimits from "../pages/Admin/ListingLimits";
 import UserManagement from "../pages/Admin/UserManagement";
 import ReportsList from "../pages/Admin/ReportsList";
 
+import VersionManagement from "../pages/Admin/VersionManagement";
+
 // User Pages
 import CreateListing from "../pages/CreateListing";
 
@@ -250,6 +252,7 @@ const userRoutes = [
   { path: "/admin/listing-limits", component: <ListingLimits /> },
   { path: "/admin/users", component: <UserManagement /> },
   { path: "/admin/reports", component: <ReportsList /> },
+  { path: "/admin/versions", component: <VersionManagement /> },
 
   // this route should be at the end of all other routes
   { path: "/", component: <Dashboard /> },

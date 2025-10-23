@@ -353,6 +353,13 @@ const SidebarContent = props => {
               </Link>
             </li>
 
+            <li>
+              <Link to="/admin/versions" className="waves-effect">
+                <i className="mdi mdi-cellphone-android"></i>
+                <span>Versiyon Yönetimi</span>
+              </Link>
+            </li>
+
             
           </ul>
         </div>
