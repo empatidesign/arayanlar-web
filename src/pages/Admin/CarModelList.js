@@ -238,10 +238,7 @@ const CarModelList = () => {
       showAlert('Marka seçimi gereklidir', 'danger');
       return;
     }
-    if (!newModel.model_year_start) {
-      showAlert('Başlangıç yılı gereklidir', 'danger');
-      return;
-    }
+
 
     try {
       setAddLoading(true);
@@ -312,10 +309,7 @@ const CarModelList = () => {
       showAlert('Marka seçimi gereklidir', 'danger');
       return;
     }
-    if (!editModel.model_year_start) {
-      showAlert('Başlangıç yılı gereklidir', 'danger');
-      return;
-    }
+
 
     try {
       setEditLoading(true);
@@ -340,14 +334,14 @@ const CarModelList = () => {
           const processedColor = {
             name: color.name,
             hex: color.hex,
-            image: color.image && typeof color.image === 'string' ? color.image : null // Keep existing image path
+            image_url: color.originalImage || null // Use originalImage (which contains image_url) for existing images
           };
           
           // If color has a new image file, add it to formData
           if (color.image && typeof color.image !== 'string') {
             const colorImageKey = `color_image_${i}`;
             formData.append(colorImageKey, color.image);
-            processedColor.image = colorImageKey; // Reference to the uploaded file
+            processedColor.image_url = colorImageKey; // Reference to the uploaded file
           }
           
           processedColors.push(processedColor);
@@ -389,8 +383,8 @@ const CarModelList = () => {
         // Add imagePreview property for existing colors
         existingColors = existingColors.map(color => ({
           ...color,
-          imagePreview: color.image ? `${process.env.REACT_APP_API_URL || 'http://localhost:3000'}${color.image}` : null,
-          originalImage: color.image // Mevcut resim yolunu sakla
+          imagePreview: color.image_url ? `${process.env.REACT_APP_API_URL || 'http://localhost:3000'}${color.image_url}` : null,
+          originalImage: color.image_url // Mevcut resim yolunu sakla
         }));
       } catch (error) {
         console.error('Error parsing colors:', error);
@@ -589,10 +583,10 @@ const CarModelList = () => {
                   </small>
                 </FormGroup>
                 
-                <Row>
-                  <Col md={6}>
+          {/*       <Row>
+                  <Col md={12}>
                     <FormGroup>
-                      <Label for="modelYearStart">Başlangıç Yılı *</Label>
+                      <Label for="modelYearStart">Başlangıç Yılı</Label>
                       <Input
                         type="number"
                         id="modelYearStart"
@@ -604,21 +598,7 @@ const CarModelList = () => {
                       />
                     </FormGroup>
                   </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label for="modelYearEnd">Bitiş Yılı</Label>
-                      <Input
-                        type="number"
-                        id="modelYearEnd"
-                        value={newModel.model_year_end}
-                        onChange={(e) => setNewModel(prev => ({ ...prev, model_year_end: e.target.value }))}
-                        placeholder="Bitiş yılını girin (opsiyonel)"
-                        min="1900"
-                        max="2030"
-                      />
-                    </FormGroup>
-                  </Col>
-                </Row>
+                </Row> */}
                 <FormGroup>
                   <Label for="modelName">Model Adı *</Label>
                   <Input
@@ -718,7 +698,7 @@ const CarModelList = () => {
                             <div className="d-flex align-items-center">
                               <Input
                                 type="color"
-                                value={color.hex.startsWith('#') ? color.hex : '#000000'}
+                                value={color?.hex && color.hex.startsWith('#') ? color.hex : '#000000'}
                                 onChange={(e) => updateColor(index, 'hex', e.target.value, false)}
                                 style={{ width: '50px', height: '38px', marginRight: '10px' }}
                                 title="Renk seçici"
@@ -821,7 +801,7 @@ const CarModelList = () => {
                 </FormGroup>
                 
                 <Row>
-                  <Col md={6}>
+             {/*      <Col md={6}>
                     <FormGroup>
                       <Label for="editModelYearStart">Başlangıç Yılı *</Label>
                       <Input
@@ -834,8 +814,8 @@ const CarModelList = () => {
                         max="2030"
                       />
                     </FormGroup>
-                  </Col>
-                  <Col md={6}>
+                  </Col> */}
+                  {/* <Col md={6}>
                     <FormGroup>
                       <Label for="editModelYearEnd">Bitiş Yılı</Label>
                       <Input
@@ -848,7 +828,7 @@ const CarModelList = () => {
                         max="2030"
                       />
                     </FormGroup>
-                  </Col>
+                  </Col> */}
                 </Row>
                 <FormGroup>
                   <Label for="editModelName">Model Adı *</Label>
@@ -935,7 +915,7 @@ const CarModelList = () => {
                             <div className="d-flex align-items-center">
                               <Input
                                 type="color"
-                                value={color.hex.startsWith('#') ? color.hex : '#000000'}
+                                value={color?.hex && color.hex.startsWith('#') ? color.hex : '#000000'}
                                 onChange={(e) => updateColor(index, 'hex', e.target.value, true)}
                                 style={{ width: '50px', height: '38px', marginRight: '10px' }}
                                 title="Renk seçici"

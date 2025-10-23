@@ -13,7 +13,6 @@ const ListingCountdown = () => {
   const formatTime = (timeString) => {
     if (!timeString) return null;
     
-    const parts = timeString.split(' ');
     const formatted = {
       days: 0,
       hours: 0,
@@ -21,17 +20,32 @@ const ListingCountdown = () => {
       seconds: 0
     };
 
-    parts.forEach(part => {
-      if (part.includes('gün')) {
-        formatted.days = parseInt(part);
-      } else if (part.includes('saat')) {
-        formatted.hours = parseInt(part);
-      } else if (part.includes('dakika')) {
-        formatted.minutes = parseInt(part);
-      } else if (part.includes('saniye')) {
-        formatted.seconds = parseInt(part);
-      }
-    });
+    // Türkçe zaman formatını parse et
+    // Örnek: "2 gün 5 saat 30 dakika 15 saniye" veya "5 saat 30 dakika 15 saniye"
+    
+    // Gün değerini bul
+    const dayMatch = timeString.match(/(\d+)\s*gün/);
+    if (dayMatch) {
+      formatted.days = parseInt(dayMatch[1], 10) || 0;
+    }
+    
+    // Saat değerini bul
+    const hourMatch = timeString.match(/(\d+)\s*saat/);
+    if (hourMatch) {
+      formatted.hours = parseInt(hourMatch[1], 10) || 0;
+    }
+    
+    // Dakika değerini bul
+    const minuteMatch = timeString.match(/(\d+)\s*dakika/);
+    if (minuteMatch) {
+      formatted.minutes = parseInt(minuteMatch[1], 10) || 0;
+    }
+    
+    // Saniye değerini bul
+    const secondMatch = timeString.match(/(\d+)\s*saniye/);
+    if (secondMatch) {
+      formatted.seconds = parseInt(secondMatch[1], 10) || 0;
+    }
 
     return formatted;
   };

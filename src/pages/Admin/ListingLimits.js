@@ -66,8 +66,10 @@ const ListingLimits = () => {
       
       if (response.ok) {
         const data = await response.json();
-        setCurrentLimit(data.daily_limit);
-        setNewLimit(data.daily_limit);
+        if (data.success && data.data) {
+          setCurrentLimit(data.data.daily_limit);
+          setNewLimit(data.data.daily_limit);
+        }
       }
     } catch (error) {
       console.error('Limit getirme hatası:', error);
@@ -237,98 +239,10 @@ const ListingLimits = () => {
               </Card>
             </Col>
 
-            {/* Sistem Durumu */}
-            <Col lg={6}>
-              <Card>
-                <CardBody>
-                  <CardTitle className="mb-4">Sistem Durumu</CardTitle>
-                  
-                  {schedulerStatus && (
-                    <div>
-                      <p><strong>Scheduler Durumu:</strong> 
-                        <Badge color={schedulerStatus.running ? 'success' : 'danger'} className="ms-2">
-                          {schedulerStatus.running ? 'Çalışıyor' : 'Durduruldu'}
-                        </Badge>
-                      </p>
-                      <p><strong>Son Sıfırlama:</strong> {schedulerStatus.lastReset || 'Henüz sıfırlanmadı'}</p>
-                      <p><strong>Sonraki Sıfırlama:</strong> {schedulerStatus.nextReset || 'Bilinmiyor'}</p>
-                    </div>
-                  )}
-
-                  <div className="mt-3">
-                    <Button 
-                      color="warning" 
-                      onClick={resetAllCounts}
-                      disabled={loading}
-                    >
-                      {loading ? 'Sıfırlanıyor...' : 'Tüm Sayaçları Sıfırla'}
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
+          
           </Row>
 
-          {/* Kullanıcı İstatistikleri */}
-          <Row>
-            <Col lg={12}>
-              <Card>
-                <CardBody>
-                  <CardTitle className="mb-4">Kullanıcı İlan İstatistikleri</CardTitle>
-                  
-                  {userCounts.length > 0 ? (
-                    <Table responsive>
-                      <thead>
-                        <tr>
-                          <th>Kullanıcı ID</th>
-                          <th>Bugünkü İlan Sayısı</th>
-                          <th>Limit Durumu</th>
-                          <th>Son Güncelleme</th>
-                          <th>İşlemler</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {userCounts.map((user, index) => (
-                          <tr key={index}>
-                            <td>{user.user_id}</td>
-                            <td>
-                              <Badge color={user.count >= currentLimit ? 'danger' : 'success'}>
-                                {user.count}
-                              </Badge>
-                            </td>
-                            <td>
-                              {user.count >= currentLimit ? (
-                                <Badge color="danger">Limit Aşıldı</Badge>
-                              ) : (
-                                <Badge color="success">Normal</Badge>
-                              )}
-                            </td>
-                            <td>{new Date(user.updated_at).toLocaleString('tr-TR')}</td>
-                            <td>
-                              <Button
-                                color="outline-warning"
-                                size="sm"
-                                onClick={() => {
-                                  setResetUserId(user.user_id);
-                                  setResetModal(true);
-                                }}
-                              >
-                                Sıfırla
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  ) : (
-                    <div className="text-center py-4">
-                      <p>Henüz ilan veren kullanıcı bulunmuyor.</p>
-                    </div>
-                  )}
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
+     
 
           {/* Kullanıcı Sayacı Sıfırlama Modal */}
           <Modal isOpen={resetModal} toggle={() => setResetModal(false)}>

@@ -49,6 +49,11 @@ const ReportsList = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [loadingChat, setLoadingChat] = useState(false);
   
+  // Görsel önizleme modal state
+  const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+  const [imagePreviewCaption, setImagePreviewCaption] = useState('');
+  
   // Form state
   const [formData, setFormData] = useState({
     status: '',
@@ -60,6 +65,46 @@ const ReportsList = () => {
 
   // API çağrıları için base URL
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+
+  // Chat resimleri için URL oluşturucu (admin erişimi)
+  const buildChatImageUrl = (message) => {
+    if (!message) return null;
+    const authUser = localStorage.getItem('authUser');
+    if (!authUser) return null;
+    const user = JSON.parse(authUser);
+    const token = user.data?.token || user.token || user.accessToken;
+    if (!token) return null;
+    const rawToken = token.startsWith('Bearer ') ? token.split(' ')[1] : token;
+
+    // Öncelik: token tabanlı erişim (by-token)
+    if (message.image_token && typeof message.image_token === 'string') {
+      const t = encodeURIComponent(message.image_token);
+      return `${API_BASE_URL}/api/chat/image/by-token?t=${t}&token=${rawToken}`;
+    }
+
+    // Geriye dönük: filename tabanlı erişim
+    const messagePath = typeof message === 'string' ? message : message.message;
+    if (!messagePath || typeof messagePath !== 'string') return null;
+    const parts = messagePath.split('/');
+    if (parts.length < 2 || parts[0] !== 'chat') return null;
+    const filename = parts[1];
+    return `${API_BASE_URL}/api/chat/image/${filename}?token=${rawToken}`;
+  };
+
+  // Görsel önizleme aç/kapat
+  const openImagePreview = (message) => {
+    const url = buildChatImageUrl(message);
+    if (!url) return;
+    setImagePreviewUrl(url);
+    setImagePreviewCaption(message.caption || '');
+    setImagePreviewOpen(true);
+  };
+
+  const closeImagePreview = () => {
+    setImagePreviewOpen(false);
+    setImagePreviewUrl(null);
+    setImagePreviewCaption('');
+  };
 
   // Şikayetleri getir
   const fetchReports = async () => {
@@ -132,7 +177,7 @@ const ReportsList = () => {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/admin/reports/${selectedReport.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/reports/${selectedReport.id}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -148,7 +193,29 @@ const ReportsList = () => {
 
       setSuccess('Şikayet başarıyla güncellendi');
       setUpdateModal(false);
-      fetchReports();
+      
+      // Listeyi yenile
+      await fetchReports();
+      
+      // Eğer detay modalı açıksa, güncellenmiş şikayet bilgilerini al
+      if (detailModal && selectedReport) {
+        try {
+          const updatedReportResponse = await fetch(`${API_BASE_URL}/api/admin/reports/${selectedReport.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (updatedReportResponse.ok) {
+            const updatedReportData = await updatedReportResponse.json();
+            setSelectedReport(updatedReportData.data);
+          }
+        } catch (error) {
+          console.error('Güncellenmiş şikayet bilgileri alınamadı:', error);
+        }
+      }
+      
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.message || 'Güncelleme sırasında hata oluştu');
@@ -600,10 +667,24 @@ const ReportsList = () => {
                                   {message.message_type === 'image' ? (
                                     <div>
                                       {message.caption && <div className="mb-2">{message.caption}</div>}
-                                      <Badge color="info" size="sm">
-                                        <i className="mdi mdi-image me-1"></i>
-                                        Resim
-                                      </Badge>
+                                      <div className="d-flex align-items-center">
+                                        <Badge color="info" size="sm" onClick={() => openImagePreview(message)} style={{ cursor: 'pointer' }} title="Resmi görüntüle">
+                                          <i className="mdi mdi-image me-1"></i>
+                                          Resim
+                                        </Badge>
+                                        {(() => {
+                                          const url = buildChatImageUrl(message);
+                                          return url ? (
+                                            <a href={url} target="_blank" rel="noopener noreferrer" className="ms-2">
+                                              <i className="mdi mdi-image-search-outline me-1"></i>
+                                              Görüntüle
+                                            </a>
+                                          ) : null;
+                                        })()}
+                                      </div>
+                                      {(() => {
+                                        return null;
+                                      })()}
                                     </div>
                                   ) : (
                                     message.message || 'Mesaj içeriği bulunamadı'
@@ -860,6 +941,22 @@ const ReportsList = () => {
               </Button>
             </ModalFooter>
           </Modal>
+
+          {/* Image Preview Modal */}
+          <Modal isOpen={imagePreviewOpen} toggle={closeImagePreview}>
+            <ModalHeader toggle={closeImagePreview}>Resim Önizleme</ModalHeader>
+            <ModalBody style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              {imagePreviewUrl ? (
+                <img src={imagePreviewUrl} alt="Sohbet resmi" style={{ width: '100%', maxHeight: '60vh', objectFit: 'contain', borderRadius: 8 }} />
+              ) : (
+                <div className="text-muted">Resim yüklenemedi</div>
+              )}
+              {imagePreviewCaption && (
+                <div className="mt-2 text-muted">{imagePreviewCaption}</div>
+              )}
+            </ModalBody>
+          </Modal>
+
         </Container>
       </div>
     </React.Fragment>

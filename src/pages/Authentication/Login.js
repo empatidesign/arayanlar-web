@@ -53,8 +53,8 @@ const Login = props => {
     enableReinitialize: true,
 
     initialValues: {
-      email: userLogin.email || "admin@arayanvar.com" || '',
-      password: userLogin.password || "admin123" || '',
+      email: userLogin.email ,
+      password: userLogin.password ,
     },
     validationSchema: Yup.object({
       email: Yup.string().required("Please Enter Your User Name"),
@@ -153,29 +153,13 @@ const Login = props => {
                         </div>
                       </div>
 
-                      <div className="mt-2 mb-0 row">
-                        <div className="col-12 mt-4">
-                          <Link to="/forgot-password"><i className="mdi mdi-lock"></i> Forgot your password?</Link>
-                        </div>
-                      </div>
+                   
 
                     </Form>
                   </div>
                 </CardBody>
               </Card>
-              <div className="mt-5 text-center">
-                <p>
-                  Don&#39;t have an account ?{" "}
-                  <Link
-                    to="/register"
-                    className="fw-medium text-primary"
-                  >
-                    {" "}
-                    Signup now{" "}
-                  </Link>{" "}
-                </p>
-              
-              </div>
+        
             </Col>
           </Row>
         </Container>

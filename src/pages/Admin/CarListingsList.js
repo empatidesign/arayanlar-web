@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Card, CardBody, Button, Table, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert, UncontrolledTooltip } from "reactstrap";
 import { Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
-import { get, patch, del } from "../../helpers/backend_helper";
+import { get, patch, del, put } from "../../helpers/backend_helper";
 
 const CarListingsList = () => {
   const [listings, setListings] = useState([]);
@@ -182,7 +182,7 @@ const CarListingsList = () => {
     try {
       setLoading(true);
       
-      const response = await patch(`/api/admin/car-listings/${selectedListing.id}/extend-duration`);
+      const response = await put(`/api/admin/car-listings/${selectedListing.id}/extend-duration`);
       
       if (response.success) {
         showAlert('İlan süresi başarıyla 7 gün uzatıldı', 'success');

@@ -181,6 +181,38 @@ const SidebarContent = props => {
     }
   }, [path, activateParentDropdown]);
 
+  // Yeni: üst menü başlıklarına tıklayınca manuel toggle
+  const toggleTopMenu = useCallback((menuId) => (e) => {
+    e.preventDefault();
+    try {
+      const anchor = document.getElementById(menuId);
+      if (!anchor) return;
+      const li = anchor.parentElement;
+      const sub = anchor.nextElementSibling;
+      const isOpen = li && li.classList.contains('mm-active');
+
+      // Tüm üst menüleri kapat
+      ['car-management-menu', 'watch-management-menu', 'housing-management-menu'].forEach(id => {
+        const a = document.getElementById(id);
+        if (!a) return;
+        const liEl = a.parentElement;
+        const subEl = a.nextElementSibling;
+        a.classList.remove('mm-active');
+        if (liEl) liEl.classList.remove('mm-active');
+        if (subEl) subEl.classList.remove('mm-show');
+      });
+
+      // Tıklanan menüyü aç/kapat
+      if (!isOpen) {
+        if (li) li.classList.add('mm-active');
+        anchor.classList.add('mm-active');
+        if (sub) sub.classList.add('mm-show');
+      }
+    } catch (err) {
+      console.error('Sidebar toggle error:', err);
+    }
+  }, []);
+
   useEffect(() => {
     ref.current.recalculate();
   }, []);
@@ -253,7 +285,7 @@ const SidebarContent = props => {
           
 
             <li>
-              <Link to="#" className="has-arrow waves-effect" id="car-management-menu">
+              <Link to="#" className="has-arrow waves-effect" id="car-management-menu" onClick={toggleTopMenu('car-management-menu')}>
                 <i className="ti-car"></i>
                 <span>Araba Yönetimi</span>
               </Link>
@@ -271,7 +303,7 @@ const SidebarContent = props => {
             </li>
 
             <li>
-              <Link to="#" className="has-arrow waves-effect" id="watch-management-menu">
+              <Link to="#" className="has-arrow waves-effect" id="watch-management-menu" onClick={toggleTopMenu('watch-management-menu')}>
                 <i className="mdi mdi-watch"></i>
                 <span>Saat Yönetimi</span>
               </Link>
@@ -289,7 +321,7 @@ const SidebarContent = props => {
             </li>
 
             <li>
-              <Link to="#" className="has-arrow waves-effect" id="housing-management-menu">
+              <Link to="#" className="has-arrow waves-effect" id="housing-management-menu" onClick={toggleTopMenu('housing-management-menu')}>
                 <i className="mdi mdi-home-city"></i>
                 <span>Konut Yönetimi</span>
               </Link>
