@@ -20,6 +20,7 @@ import Login from "../pages/Authentication/Login";
 import Logout from "../pages/Authentication/Logout";
 import Register from "../pages/Authentication/Register";
 import ForgetPwd from "../pages/Authentication/ForgetPassword";
+import ResetPasswordRedirect from "../pages/Authentication/ResetPasswordRedirect";
 
 //  // Inner Authentication
 import Login1 from "../pages/AuthenticationInner/Login";
@@ -262,6 +263,7 @@ const authRoutes = [
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
   { path: "/forgot-password", component: <ForgetPwd /> },
+  { path: "/reset-password", component: <ResetPasswordRedirect /> },
   { path: "/register", component: <Register /> },
 
   { path: "/pages-maintenance", component: <PagesMaintenance /> },
