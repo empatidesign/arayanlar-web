@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'arayanvar-web',
       script: 'npx',
-      args: 'serve -s build -l 3001',
+      args: 'serve -s build -p 3001',
       env: {
         NODE_ENV: 'production',
         PORT: 3001
