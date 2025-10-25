@@ -133,6 +133,7 @@ import ListingSchedule from "../pages/Admin/ListingSchedule";
 import ListingLimits from "../pages/Admin/ListingLimits";
 import UserManagement from "../pages/Admin/UserManagement";
 import ReportsList from "../pages/Admin/ReportsList";
+import TransactionsManagement from "../pages/Admin/TransactionsManagement";
 
 import VersionManagement from "../pages/Admin/VersionManagement";
 
@@ -252,6 +253,7 @@ const userRoutes = [
   { path: "/admin/listing-schedule", component: <ListingSchedule /> },
   { path: "/admin/listing-limits", component: <ListingLimits /> },
   { path: "/admin/users", component: <UserManagement /> },
+  { path: "/admin/transactions", component: <TransactionsManagement /> },
   { path: "/admin/reports", component: <ReportsList /> },
   { path: "/admin/versions", component: <VersionManagement /> },
 

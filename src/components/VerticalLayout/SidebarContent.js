@@ -266,7 +266,12 @@ const SidebarContent = props => {
               </Link>
             </li>
 
-            
+            <li>
+              <Link to="/admin/transactions" className="waves-effect">
+                <i className="ti-receipt"></i>
+                <span>İşlemler</span>
+              </Link>
+            </li>
 
             <li>
               <Link to="/admin/categories" className="waves-effect">
