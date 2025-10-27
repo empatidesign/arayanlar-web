@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -57,6 +58,45 @@ const DistrictList = () => {
       setError('İlçeler yüklenirken hata oluştu');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Liste içinde öğeleri yeniden sıralamak için yardımcı
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  // Sürükle-bırak bittiğinde çağrılır
+  const onDistrictDragEnd = async (result) => {
+    if (!result.destination) return;
+
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
+    if (sourceIndex === destIndex) return;
+
+    const prev = districts;
+    const reordered = reorder(prev, sourceIndex, destIndex);
+    setDistricts(reordered);
+
+    const payload = {
+      orders: reordered.map((d, idx) => ({ id: d.id, order_index: idx + 1 }))
+    };
+
+    try {
+      const resp = await put('/api/districts/order', payload);
+      if (resp?.success) {
+        setSuccess('Sıralama başarıyla güncellendi');
+      } else {
+        setError(resp?.message || 'Sıralama güncellenirken hata oluştu');
+        setDistricts(prev); // geri al
+      }
+    } catch (err) {
+      console.error('İlçe sıralama güncelleme hatası:', err);
+      setError('Sıralama güncellenirken bir hata oluştu');
+      setDistricts(prev); // geri al
     }
   };
 
@@ -198,9 +238,13 @@ const DistrictList = () => {
                     </div>
                   ) : (
                     <div className="table-responsive">
+                      <DragDropContext onDragEnd={onDistrictDragEnd}>
                       <Table className="table table-centered table-nowrap mb-0">
                         <thead>
                           <tr>
+                            <th style={{ width: '36px' }} title="Sürükleyip taşı">
+                              <i className="mdi mdi-drag"></i>
+                            </th>
                             <th>ID</th>
                             <th>Resim</th>
                             <th>İlçe Adı</th>
@@ -208,64 +252,84 @@ const DistrictList = () => {
                             <th>İşlemler</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          {districts.length > 0 ? (
-                            districts.map((district) => (
-                              <tr key={district.id}>
-                                <td>{district.id}</td>
-                                <td>
-                                  {district.image ? (
-                                    <img
-                                      src={getImageUrl(district.image)}
-                                      alt={district.name}
-                                      className="rounded"
-                                      style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                    />
-                                  ) : (
-                                    <div 
-                                      className="bg-light rounded d-flex align-items-center justify-content-center"
-                                      style={{ width: '50px', height: '50px' }}
-                                    >
-                                      <i className="mdi mdi-image text-muted"></i>
-                                    </div>
-                                  )}
-                                </td>
-                                <td>{district.name}</td>
-                                <td>
-                                  {district.created_at ? 
-                                    new Date(district.created_at).toLocaleDateString('tr-TR') : 
-                                    '-'
-                                  }
-                                </td>
-                                <td>
-                                  <div className="d-flex gap-2">
-                                    <Button
-                                      color="info"
-                                      size="sm"
-                                      onClick={() => openEditModal(district)}
-                                    >
-                                      <i className="mdi mdi-pencil"></i>
-                                    </Button>
-                                    <Button
-                                      color="danger"
-                                      size="sm"
-                                      onClick={() => openDeleteModal(district)}
-                                    >
-                                      <i className="mdi mdi-delete"></i>
-                                    </Button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan="5" className="text-center">
-                                Henüz ilçe bulunmuyor
-                              </td>
-                            </tr>
+                        <Droppable droppableId="districts-droppable" direction="vertical">
+                          {(provided) => (
+                            <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                              {districts.length > 0 ? (
+                                districts.map((district, index) => (
+                                  <Draggable key={district.id} draggableId={`district-${district.id}`} index={index}>
+                                    {(providedDraggable, snapshot) => (
+                                      <tr
+                                        ref={providedDraggable.innerRef}
+                                        {...providedDraggable.draggableProps}
+                                        style={{
+                                          ...providedDraggable.draggableProps.style,
+                                          background: snapshot.isDragging ? '#f8f9fa' : undefined
+                                        }}
+                                      >
+                                        <td {...providedDraggable.dragHandleProps} className="text-muted">
+                                          <i className="mdi mdi-drag"></i>
+                                        </td>
+                                        <td>{district.id}</td>
+                                        <td>
+                                          {district.image ? (
+                                            <img
+                                              src={getImageUrl(district.image)}
+                                              alt={district.name}
+                                              className="rounded"
+                                              style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                            />
+                                          ) : (
+                                            <div 
+                                              className="bg-light rounded d-flex align-items-center justify-content-center"
+                                              style={{ width: '50px', height: '50px' }}
+                                            >
+                                              <i className="mdi mdi-image text-muted"></i>
+                                            </div>
+                                          )}
+                                        </td>
+                                        <td>{district.name}</td>
+                                        <td>
+                                          {district.created_at ? 
+                                            new Date(district.created_at).toLocaleDateString('tr-TR') : 
+                                            '-'
+                                          }
+                                        </td>
+                                        <td>
+                                          <div className="d-flex gap-2">
+                                            <Button
+                                              color="info"
+                                              size="sm"
+                                              onClick={() => openEditModal(district)}
+                                            >
+                                              <i className="mdi mdi-pencil"></i>
+                                            </Button>
+                                            <Button
+                                              color="danger"
+                                              size="sm"
+                                              onClick={() => openDeleteModal(district)}
+                                            >
+                                              <i className="mdi mdi-delete"></i>
+                                            </Button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </Draggable>
+                                ))
+                              ) : (
+                                <tr>
+                                  <td colSpan="6" className="text-center">
+                                    Henüz ilçe bulunmuyor
+                                  </td>
+                                </tr>
+                              )}
+                              {provided.placeholder}
+                            </tbody>
                           )}
-                        </tbody>
+                        </Droppable>
                       </Table>
+                      </DragDropContext>
                     </div>
                   )}
                 </CardBody>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Card, CardBody, CardTitle, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert, Badge } from 'reactstrap';
 import { get, post, put, del, patch } from '../../helpers/api_helper';
 
@@ -170,6 +171,33 @@ const WatchModelList = () => {
     } catch (error) {
       console.error('Durum güncelleme hatası:', error);
       showAlert('Durum güncelleme sırasında hata oluştu', 'danger');
+    }
+  };
+
+  const onModelDragEnd = async (result) => {
+    if (!result.destination) return;
+    const previous = models;
+    const reordered = Array.from(models);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+
+    const withOrder = reordered.map((m, idx) => ({ ...m, order_index: idx + 1 }));
+    setModels(withOrder);
+
+    try {
+      const orders = withOrder.map((m, idx) => ({ id: m.id, order_index: idx + 1 }));
+      const resp = await put('/api/watches/models/order', { orders });
+      if (!resp || resp.success !== true) {
+        setModels(previous);
+        showAlert(resp?.message || 'Sıralama kaydedilemedi', 'danger');
+      } else {
+        showAlert('Sıralama güncellendi', 'success');
+      }
+    } catch (error) {
+      console.error('Saat modeli sıralama hatası:', error);
+      setModels(previous);
+      const msg = error?.response?.data?.message || 'Sıralama kaydedilirken hata oluştu';
+      showAlert(msg, 'danger');
     }
   };
 
@@ -434,6 +462,7 @@ const WatchModelList = () => {
                   <Table className="table-nowrap mb-0">
                     <thead>
                       <tr>
+                        <th style={{ width: '40px' }}></th>
                         <th>Görsel</th>
                         <th>Model Adı</th>
                         <th>Marka</th>
@@ -443,77 +472,91 @@ const WatchModelList = () => {
                         <th>İşlemler</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {models.map((model) => (
-                        <tr key={model.id}>
-                          <td>
-                            {model.image ? (
-                              <img
-                                src={`${process.env.REACT_APP_API_URL}${model.image}`}
-                                alt={model.name}
-                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                              />
-                            ) : (
-                              <div className="bg-light d-flex align-items-center justify-content-center" 
-                                   style={{ width: '50px', height: '50px' }}>
-                                <i className="fas fa-image text-muted"></i>
-                              </div>
-                            )}
-                          </td>
-                          <td>
-                            <div>
-                              <h6 className="mb-1">{model.name}</h6>
-                              {model.description && (
-                                <small className="text-muted">
-                                  {model.description.length > 50 
-                                    ? model.description.substring(0, 50) + '...' 
-                                    : model.description}
-                                </small>
-                              )}
-                            </div>
-                          </td>
-                          <td>{model.brand_name || '-'}</td>
-                          <td>{model.model || '-'}</td>
-                          <td>
-                            {model.specifications && typeof model.specifications === 'string' && model.specifications.trim() ? (
-                              <small className="text-muted">
-                                {model.specifications.length > 30 
-                                  ? model.specifications.substring(0, 30) + '...' 
-                                  : model.specifications}
-                              </small>
-                            ) : '-'}
-                          </td>
-                          <td>
-                            <Badge 
-                              color={model.is_active ? "success" : "danger"}
-                              style={{ cursor: 'pointer' }}
-                              onClick={() => handleToggleStatus(model.id)}
-                              title="Durumu değiştirmek için tıklayın"
-                            >
-                              {model.is_active ? "Aktif" : "Pasif"}
-                            </Badge>
-                          </td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                color="info"
-                                size="sm"
-                                onClick={() => openEditModal(model)}
-                              >
-                                <i className="fas fa-edit"></i>
-                              </Button>
-                              <Button
-                                color="danger"
-                                size="sm"
-                                onClick={() => openDeleteModal(model)}
-                              >
-                                <i className="fas fa-trash"></i>
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    <DragDropContext onDragEnd={onModelDragEnd}>
+                      <Droppable droppableId="watchModels">
+                        {(provided) => (
+                          <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                            {models.map((model, index) => (
+                              <Draggable key={model.id} draggableId={`model-${model.id}`} index={index}>
+                                {(providedRow) => (
+                                  <tr ref={providedRow.innerRef} {...providedRow.draggableProps}>
+                                    <td {...providedRow.dragHandleProps} className="text-muted" style={{ cursor: 'grab' }}>
+                                      <i className="fas fa-grip-vertical"></i>
+                                    </td>
+                                    <td>
+                                      {model.image ? (
+                                        <img
+                                          src={`${process.env.REACT_APP_API_URL}${model.image}`}
+                                          alt={model.name}
+                                          style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                        />
+                                      ) : (
+                                        <div className="bg-light d-flex align-items-center justify-content-center" 
+                                             style={{ width: '50px', height: '50px' }}>
+                                          <i className="fas fa-image text-muted"></i>
+                                        </div>
+                                      )}
+                                    </td>
+                                    <td>
+                                      <div>
+                                        <h6 className="mb-1">{model.name}</h6>
+                                        {model.description && (
+                                          <small className="text-muted">
+                                            {model.description.length > 50 
+                                              ? model.description.substring(0, 50) + '...' 
+                                              : model.description}
+                                          </small>
+                                        )}
+                                      </div>
+                                    </td>
+                                    <td>{model.brand_name || '-'}</td>
+                                    <td>{model.model || '-'}</td>
+                                    <td>
+                                      {model.specifications && typeof model.specifications === 'string' && model.specifications.trim() ? (
+                                        <small className="text-muted">
+                                          {model.specifications.length > 30 
+                                            ? model.specifications.substring(0, 30) + '...' 
+                                            : model.specifications}
+                                        </small>
+                                      ) : '-'}
+                                    </td>
+                                    <td>
+                                      <Badge 
+                                        color={model.is_active ? "success" : "danger"}
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={() => handleToggleStatus(model.id)}
+                                        title="Durumu değiştirmek için tıklayın"
+                                      >
+                                        {model.is_active ? "Aktif" : "Pasif"}
+                                      </Badge>
+                                    </td>
+                                    <td>
+                                      <div className="d-flex gap-2">
+                                        <Button
+                                          color="info"
+                                          size="sm"
+                                          onClick={() => openEditModal(model)}
+                                        >
+                                          <i className="fas fa-edit"></i>
+                                        </Button>
+                                        <Button
+                                          color="danger"
+                                          size="sm"
+                                          onClick={() => openDeleteModal(model)}
+                                        >
+                                          <i className="fas fa-trash"></i>
+                                        </Button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </tbody>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
                   </Table>
                   {models.length === 0 && (
                     <div className="text-center py-4">

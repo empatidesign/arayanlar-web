@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Card, CardBody, CardTitle, Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 import { get, post, put, del } from '../../helpers/api_helper';
 
@@ -132,6 +133,33 @@ const WatchBrandList = () => {
     setFormData({ ...formData, logo: file });
   };
 
+  const onBrandDragEnd = async (result) => {
+    if (!result.destination) return;
+    const previous = brands;
+    const reordered = Array.from(brands);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+
+    const withOrder = reordered.map((b, idx) => ({ ...b, order_index: idx + 1 }));
+    setBrands(withOrder);
+
+    try {
+      const orders = withOrder.map((b, idx) => ({ id: b.id, order_index: idx + 1 }));
+      const resp = await put('/api/watches/brands/order', { orders });
+      if (!resp || resp.success !== true) {
+        setBrands(previous);
+        showAlert(resp?.message || 'Sıralama kaydedilemedi', 'danger');
+      } else {
+        showAlert('Sıralama güncellendi', 'success');
+      }
+    } catch (error) {
+      console.error('Saat markası sıralama hatası:', error);
+      setBrands(previous);
+      const msg = error?.response?.data?.message || 'Sıralama kaydedilirken hata oluştu';
+      showAlert(msg, 'danger');
+    }
+  };
+
   if (loading) {
     return (
       <div className="page-content">
@@ -177,50 +205,65 @@ const WatchBrandList = () => {
                   <Table className="table-nowrap mb-0">
                     <thead>
                       <tr>
+                        <th style={{ width: '40px' }}></th>
                         <th>Logo</th>
                         <th>Marka Adı</th>
                         <th>İşlemler</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {brands.map((brand) => (
-                        <tr key={brand.id}>
-                          <td>
-                            {brand.image ? (
-                              <img
-                                src={`${process.env.REACT_APP_API_URL}${brand.image}`}
-                                alt={brand.name}
-                                style={{ width: '40px', height: '40px', objectFit: 'contain' }}
-                              />
-                            ) : (
-                              <div className="bg-light d-flex align-items-center justify-content-center" 
-                                   style={{ width: '40px', height: '40px' }}>
-                                <i className="fas fa-image text-muted"></i>
-                              </div>
-                            )}
-                          </td>
-                          <td>{brand.name}</td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                color="info"
-                                size="sm"
-                                onClick={() => openEditModal(brand)}
-                              >
-                                <i className="fas fa-edit"></i>
-                              </Button>
-                              <Button
-                                color="danger"
-                                size="sm"
-                                onClick={() => openDeleteModal(brand)}
-                              >
-                                <i className="fas fa-trash"></i>
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                    <DragDropContext onDragEnd={onBrandDragEnd}>
+                      <Droppable droppableId="watchBrands">
+                        {(provided) => (
+                          <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                            {brands.map((brand, index) => (
+                              <Draggable key={brand.id} draggableId={`brand-${brand.id}`} index={index}>
+                                {(providedRow) => (
+                                  <tr ref={providedRow.innerRef} {...providedRow.draggableProps}>
+                                    <td {...providedRow.dragHandleProps} className="text-muted" style={{ cursor: 'grab' }}>
+                                      <i className="fas fa-grip-vertical"></i>
+                                    </td>
+                                    <td>
+                                      {brand.image ? (
+                                        <img
+                                          src={`${process.env.REACT_APP_API_URL}${brand.image}`}
+                                          alt={brand.name}
+                                          style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                                        />
+                                      ) : (
+                                        <div className="bg-light d-flex align-items-center justify-content-center" 
+                                             style={{ width: '40px', height: '40px' }}>
+                                          <i className="fas fa-image text-muted"></i>
+                                        </div>
+                                      )}
+                                    </td>
+                                    <td>{brand.name}</td>
+                                    <td>
+                                      <div className="d-flex gap-2">
+                                        <Button
+                                          color="info"
+                                          size="sm"
+                                          onClick={() => openEditModal(brand)}
+                                        >
+                                          <i className="fas fa-edit"></i>
+                                        </Button>
+                                        <Button
+                                          color="danger"
+                                          size="sm"
+                                          onClick={() => openDeleteModal(brand)}
+                                        >
+                                          <i className="fas fa-trash"></i>
+                                        </Button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </tbody>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
                   </Table>
                   {brands.length === 0 && (
                     <div className="text-center py-4">

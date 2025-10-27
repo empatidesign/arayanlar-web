@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Row, Col, Card, CardBody, Button, Table, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert } from "reactstrap";
 import { Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
@@ -54,6 +55,29 @@ const CarModelList = () => {
     fetchModels();
     fetchBrands();
   }, []);
+
+  const onModelDragEnd = async (result) => {
+    if (!result.destination) return;
+    const previous = models;
+    const reordered = Array.from(models);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    setModels(reordered);
+
+    try {
+      await put('/api/admin/car-models/order', {
+        orders: reordered.map((m, idx) => ({ id: m.id, order_index: idx + 1 }))
+      });
+      showAlert('Model sıralaması güncellendi');
+    } catch (error) {
+      console.error('Model sıralaması güncellenirken hata:', error);
+      if (error.response) {
+        console.error('Backend hata yanıtı:', error.response.status, error.response.data);
+      }
+      showAlert('Model sıralaması güncellenemedi', 'danger');
+      setModels(previous);
+    }
+  };
 
   const fetchModels = async () => {
     try {
@@ -451,6 +475,7 @@ const CarModelList = () => {
                       <Table className="table-nowrap mb-0">
                         <thead>
                           <tr>
+                            <th></th>
                             <th>ID</th>
                             <th>Resim</th>
                             <th>Model Adı</th>
@@ -461,11 +486,19 @@ const CarModelList = () => {
                             <th>İşlemler</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          {models.length > 0 ? (
-                            models.map((model) => (
-                              <tr key={model.id}>
-                                <td>{model.id}</td>
+                        <DragDropContext onDragEnd={onModelDragEnd}>
+                          <Droppable droppableId="car-models-droppable" direction="vertical">
+                            {(provided) => (
+                              <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                                {models.length > 0 ? (
+                                  models.map((model, index) => (
+                                    <Draggable key={model.id} draggableId={String(model.id)} index={index}>
+                                      {(draggableProvided) => (
+                                        <tr ref={draggableProvided.innerRef} {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps}>
+                                          <td className="text-muted" style={{ cursor: 'grab' }}>
+                                            <i className="mdi mdi-drag"></i>
+                                          </td>
+                                          <td>{model.id}</td>
                                 <td>
                                   {model.image_url ? (
                                     <img 
@@ -527,16 +560,22 @@ const CarModelList = () => {
                                     <i className="mdi mdi-delete"></i>
                                   </Button>
                                 </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan="7" className="text-center">
-                                Henüz model bulunmuyor
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
+                                        </tr>
+                                      )}
+                                    </Draggable>
+                                  ))
+                                ) : (
+                                  <tr>
+                                    <td colSpan="9" className="text-center">
+                                      Henüz model bulunmuyor
+                                    </td>
+                                  </tr>
+                                )}
+                                {provided.placeholder}
+                              </tbody>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
                       </Table>
                     </div>
                   )}

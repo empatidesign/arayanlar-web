@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Row, Col, Card, CardBody, Button, Table, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert } from "reactstrap";
 import { Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
@@ -40,6 +41,29 @@ const CarBrandList = () => {
   useEffect(() => {
     fetchBrands();
   }, []);
+
+  const onDragEnd = async (result) => {
+    if (!result.destination) return;
+    const previous = brands;
+    const reordered = Array.from(brands);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    setBrands(reordered);
+
+    try {
+      await put('/api/admin/car-brands/order', {
+        orders: reordered.map((b, idx) => ({ id: b.id, order_index: idx + 1 }))
+      });
+      showAlert('Marka sıralaması güncellendi');
+    } catch (error) {
+      console.error('Marka sıralaması güncellenirken hata:', error);
+      if (error.response) {
+        console.error('Backend hata yanıtı:', error.response.status, error.response.data);
+      }
+      showAlert('Marka sıralaması güncellenemedi', 'danger');
+      setBrands(previous);
+    }
+  };
 
   const fetchBrands = async () => {
     try {
@@ -218,6 +242,7 @@ const CarBrandList = () => {
                       <Table className="table-nowrap mb-0">
                         <thead>
                           <tr>
+                            <th style={{ width: '40px' }}>Taşı</th>
                             <th>ID</th>
                             <th>Resim</th>
                             <th>Marka Adı</th>
@@ -227,75 +252,89 @@ const CarBrandList = () => {
                             <th>İşlemler</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          {brands.length > 0 ? (
-                            brands.map((brand) => (
-                              <tr key={brand.id}>
-                                <td>{brand.id}</td>
-                                <td>
-                                  {brand.logo_url ? (
-                                    <img 
-                                      src={`${process.env.REACT_APP_API_URL || 'http://localhost:3000'}${brand.logo_url}`} 
-                                      alt={brand.name}
-                                      style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
-                                    />
-                                  ) : (
-                                    <div 
-                                      style={{ 
-                                        width: '50px', 
-                                        height: '50px', 
-                                        backgroundColor: '#f8f9fa', 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        justifyContent: 'center',
-                                        borderRadius: '4px'
-                                      }}
-                                    >
-                                      <i className="mdi mdi-image text-muted"></i>
-                                    </div>
-                                  )}
-                                </td>
-                                <td>{brand.name}</td>
-                                <td>
-                                  <Badge 
-                                    color={brand.model_count > 0 ? "success" : "secondary"}
-                                    className="me-1"
-                                  >
-                                    {brand.model_count || 0} model
-                                  </Badge>
-                                </td>
-                                <td>{brand.description || '-'}</td>
-                                <td>{new Date(brand.created_at).toLocaleDateString('tr-TR')}</td>
-                                <td>
-                                  <Button
-                                    color="info"
-                                    size="sm"
-                                    className="me-2"
-                                    onClick={() => openEditModal(brand)}
-                                  >
-                                    <i className="mdi mdi-pencil"></i>
-                                  </Button>
-                                  <Button
-                                    color="danger"
-                                    size="sm"
-                                    onClick={() => {
-                                      setSelectedBrand(brand);
-                                      setDeleteModal(true);
-                                    }}
-                                  >
-                                    <i className="mdi mdi-delete"></i>
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan="6" className="text-center">
-                                Henüz marka bulunmuyor
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
+                        <DragDropContext onDragEnd={onDragEnd}>
+                          <Droppable droppableId="car-brands-droppable" direction="vertical">
+                            {(provided) => (
+                              <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                                {brands.length > 0 ? (
+                                  brands.map((brand, index) => (
+                                    <Draggable key={brand.id} draggableId={String(brand.id)} index={index}>
+                                      {(draggableProvided) => (
+                                        <tr ref={draggableProvided.innerRef} {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps}>
+                                          <td className="text-muted" style={{ cursor: 'grab' }}>
+                                            <i className="mdi mdi-drag"></i>
+                                          </td>
+                                          <td>{brand.id}</td>
+                                          <td>
+                                            {brand.logo_url ? (
+                                              <img 
+                                                src={`${process.env.REACT_APP_API_URL || 'http://localhost:3000'}${brand.logo_url}`} 
+                                                alt={brand.name}
+                                                style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                                              />
+                                            ) : (
+                                              <div 
+                                                style={{ 
+                                                  width: '50px', 
+                                                  height: '50px', 
+                                                  backgroundColor: '#f8f9fa', 
+                                                  display: 'flex', 
+                                                  alignItems: 'center', 
+                                                  justifyContent: 'center',
+                                                  borderRadius: '4px'
+                                                }}
+                                              >
+                                                <i className="mdi mdi-image text-muted"></i>
+                                              </div>
+                                            )}
+                                          </td>
+                                          <td>{brand.name}</td>
+                                          <td>
+                                            <Badge 
+                                              color={brand.model_count > 0 ? "success" : "secondary"}
+                                              className="me-1"
+                                            >
+                                              {brand.model_count || 0} model
+                                            </Badge>
+                                          </td>
+                                          <td>{brand.description || '-'}</td>
+                                          <td>{new Date(brand.created_at).toLocaleDateString('tr-TR')}</td>
+                                          <td>
+                                            <Button
+                                              color="info"
+                                              size="sm"
+                                              className="me-2"
+                                              onClick={() => openEditModal(brand)}
+                                            >
+                                              <i className="mdi mdi-pencil"></i>
+                                            </Button>
+                                            <Button
+                                              color="danger"
+                                              size="sm"
+                                              onClick={() => {
+                                                setSelectedBrand(brand);
+                                                setDeleteModal(true);
+                                              }}
+                                            >
+                                              <i className="mdi mdi-delete"></i>
+                                            </Button>
+                                          </td>
+                                        </tr>
+                                      )}
+                                    </Draggable>
+                                  ))
+                                ) : (
+                                  <tr>
+                                    <td colSpan="8" className="text-center">
+                                      Henüz marka bulunmuyor
+                                    </td>
+                                  </tr>
+                                )}
+                                {provided.placeholder}
+                              </tbody>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
                       </Table>
                     </div>
                   )}
