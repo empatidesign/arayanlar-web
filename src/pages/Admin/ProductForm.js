@@ -139,12 +139,6 @@ const ProductForm = () => {
     console.log('🖼️ Resim seçildi:', file);
     
     if (file) {
-      // Dosya boyutu kontrolü (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Dosya boyutu 5MB\'dan küçük olmalıdır.');
-        return;
-      }
-
       // Dosya tipi kontrolü
       if (!file.type.startsWith('image/')) {
         setError('Sadece resim dosyaları yüklenebilir.');

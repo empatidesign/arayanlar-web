@@ -364,12 +364,6 @@ const UserManagement = () => {
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Dosya boyutu kontrolü (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Dosya boyutu 5MB\'dan küçük olmalıdır');
-        return;
-      }
-
       // Dosya tipi kontrolü
       if (!file.type.startsWith('image/')) {
         setError('Sadece resim dosyaları yüklenebilir');
@@ -965,7 +959,7 @@ const UserManagement = () => {
                              </Button>
                            </div>
                            <small className="text-muted">
-                             Maksimum dosya boyutu: 5MB. Desteklenen formatlar: JPG, PNG, GIF
+                             Desteklenen formatlar: JPG, PNG, GIF
                            </small>
                          </div>
                        </div>

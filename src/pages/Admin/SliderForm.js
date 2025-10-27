@@ -224,7 +224,7 @@ const SliderForm = () => {
                             required={!isEdit}
                           />
                           <small className="text-muted">
-                            Maksimum dosya boyutu: 5MB. Desteklenen formatlar: JPG, PNG, GIF
+                            Desteklenen formatlar: JPG, PNG, GIF
                           </small>
                         </FormGroup>
 
