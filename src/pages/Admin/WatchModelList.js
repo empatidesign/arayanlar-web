@@ -25,21 +25,39 @@ const WatchModelList = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [editImagePreview, setEditImagePreview] = useState(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalModels, setTotalModels] = useState(0);
+  const [limit] = useState(20);
+
   useEffect(() => {
     fetchModels();
     fetchBrands();
-  }, []);
+  }, [currentPage]);
 
   const fetchModels = async () => {
     try {
       setLoading(true);
       console.log('Fetching models...');
-      const response = await get('/api/watches/models');
+      
+      const queryParams = new URLSearchParams({
+        page: currentPage,
+        limit: limit
+      });
+      
+      const response = await get(`/api/watches/models?${queryParams}`);
       console.log('Models response:', response);
       
       if (response.success) {
         console.log('Models data:', response.models);
         setModels(response.models || []);
+        
+        // Pagination bilgilerini set et
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages || 1);
+          setTotalModels(response.pagination.total || 0);
+        }
       } else {
         console.error('Response not successful:', response);
         setModels([]);
@@ -51,6 +69,63 @@ const WatchModelList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Sayfa değişikliklerini handle et
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Pagination render
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <Button
+          key={i}
+          color={currentPage === i ? "primary" : "light"}
+          size="sm"
+          className="me-1"
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </Button>
+      );
+    }
+    return (
+      <div className="d-flex justify-content-center align-items-center mt-3">
+        <div className="me-3">
+          <small className="text-muted">
+            Toplam {totalModels} model, Sayfa {currentPage} / {totalPages}
+          </small>
+        </div>
+        <div>
+          {currentPage > 1 && (
+            <Button
+              color="light"
+              size="sm"
+              className="me-1"
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Önceki
+            </Button>
+          )}
+          {pages}
+          {currentPage < totalPages && (
+            <Button
+              color="light"
+              size="sm"
+              className="ms-1"
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Sonraki
+            </Button>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const fetchBrands = async () => {
@@ -558,14 +633,17 @@ const WatchModelList = () => {
                       </Droppable>
                     </DragDropContext>
                   </Table>
-                  {models.length === 0 && (
-                    <div className="text-center py-4">
-                      <p className="text-muted">Henüz saat modeli bulunmuyor.</p>
-                    </div>
-                  )}
                 </div>
-              </CardBody>
-            </Card>
+                {models.length === 0 && (
+                  <div className="text-center py-4">
+                    <p className="text-muted">Henüz saat modeli bulunmuyor.</p>
+                  </div>
+                )}
+                
+                {/* Pagination */}
+                {renderPagination()}
+                </CardBody>
+              </Card>
           </div>
         </div>
 
