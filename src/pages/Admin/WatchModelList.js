@@ -166,7 +166,8 @@ const WatchModelList = () => {
       name: '',
       hex: '#000000',
       image: null,
-      imagePreview: null
+      imagePreview: null,
+      gender: 'unisex' // Default olarak unisex
     };
     
     if (isEdit) {
@@ -301,27 +302,39 @@ const WatchModelList = () => {
 
       // Renk verilerini ekle
       if (formData.colors && formData.colors.length > 0) {
+        console.log('Processing colors:', formData.colors);
+        
         // Process colors and upload color images
         const processedColors = [];
         
         for (let i = 0; i < formData.colors.length; i++) {
           const color = formData.colors[i];
+          console.log(`Processing color ${i}:`, color);
+          
           const processedColor = {
             name: color.name,
             hex: color.hex,
-            image: color.image && typeof color.image === 'string' ? color.image : null // Keep existing image path
+            gender: color.gender || 'unisex', // Gender alanını ekle
+            image: null // Başlangıçta null
           };
           
-          // If color has a new image file, add it to formData
-          if (color.image && typeof color.image !== 'string') {
+          // Eğer mevcut bir resim yolu varsa (string), onu koru
+          if (color.image && typeof color.image === 'string') {
+            processedColor.image = color.image;
+            console.log(`Color ${i} has existing image:`, color.image);
+          }
+          // Eğer yeni bir dosya yüklendiyse (File object)
+          else if (color.image && typeof color.image !== 'string') {
             const colorImageKey = `color_image_${i}`;
             submitData.append(colorImageKey, color.image);
-            processedColor.image = colorImageKey; // Reference to the uploaded file
+            processedColor.image = colorImageKey; // Backend'de bu key ile dosya bulunacak
+            console.log(`Color ${i} has new file, key:`, colorImageKey);
           }
           
           processedColors.push(processedColor);
         }
         
+        console.log('Processed colors:', processedColors);
         submitData.append('colors', JSON.stringify(processedColors));
       }
 
@@ -352,7 +365,9 @@ const WatchModelList = () => {
       }
     } catch (error) {
       console.error('Form gönderme hatası:', error);
-      showAlert('İşlem sırasında hata oluştu', 'danger');
+      // Backend'den gelen hata mesajını göster
+      const errorMessage = error.response?.data?.message || error.message || 'İşlem sırasında hata oluştu';
+      showAlert(errorMessage, 'danger');
     }
   };
 
@@ -424,7 +439,8 @@ const WatchModelList = () => {
       parsedColors = parsedColors.map(color => ({
         ...color,
         imagePreview: null, // Yeni yüklenen resimler için
-        originalImage: color.image || (color.images && color.images.length > 0 ? color.images[0] : null) // Mevcut resim yolunu sakla
+        originalImage: color.image || (color.images && color.images.length > 0 ? color.images[0] : null), // Mevcut resim yolunu sakla
+        gender: color.gender || 'unisex' // Eğer gender yoksa default unisex
       }));
       
       console.log('Processed colors:', parsedColors);
@@ -751,7 +767,7 @@ const WatchModelList = () => {
                       </div>
                       
                       <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                           <FormGroup>
                             <Label>Renk Adı *</Label>
                             <Input
@@ -763,7 +779,22 @@ const WatchModelList = () => {
                             />
                           </FormGroup>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-3">
+                          <FormGroup>
+                            <Label>Cinsiyet *</Label>
+                            <Input
+                              type="select"
+                              value={color.gender || 'unisex'}
+                              onChange={(e) => updateColor(index, 'gender', e.target.value, false)}
+                              required
+                            >
+                              <option value="male">Erkek</option>
+                              <option value="female">Kadın</option>
+                              <option value="unisex">Unisex</option>
+                            </Input>
+                          </FormGroup>
+                        </div>
+                        <div className="col-md-3">
                           <FormGroup>
                             <Label>Renk Kodu *</Label>
                             <div className="d-flex align-items-center">
@@ -778,13 +809,13 @@ const WatchModelList = () => {
                                 type="text"
                                 value={color.hex || ''}
                                 onChange={(e) => updateColor(index, 'hex', e.target.value, false)}
-                                placeholder="Renk kodu (örn: #FF0000, kırmızı, rgb(255,0,0))"
-                                title="Renk kodu - hex, rgb veya renk adı girebilirsiniz"
+                                placeholder="#FF0000"
+                                title="Renk kodu"
                               />
                             </div>
                           </FormGroup>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                           <FormGroup>
                             <Label>Renk Resmi</Label>
                             <Input
@@ -952,7 +983,7 @@ const WatchModelList = () => {
                       </div>
                       
                       <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                           <FormGroup>
                             <Label>Renk Adı *</Label>
                             <Input
@@ -964,7 +995,22 @@ const WatchModelList = () => {
                             />
                           </FormGroup>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-3">
+                          <FormGroup>
+                            <Label>Cinsiyet *</Label>
+                            <Input
+                              type="select"
+                              value={color.gender || 'unisex'}
+                              onChange={(e) => updateColor(index, 'gender', e.target.value, true)}
+                              required
+                            >
+                              <option value="male">Erkek</option>
+                              <option value="female">Kadın</option>
+                              <option value="unisex">Unisex</option>
+                            </Input>
+                          </FormGroup>
+                        </div>
+                        <div className="col-md-3">
                           <FormGroup>
                             <Label>Renk Kodu *</Label>
                             <div className="d-flex align-items-center">
@@ -979,13 +1025,13 @@ const WatchModelList = () => {
                                 type="text"
                                 value={color.hex || ''}
                                 onChange={(e) => updateColor(index, 'hex', e.target.value, true)}
-                                placeholder="Renk kodu (örn: #FF0000, kırmızı, rgb(255,0,0))"
-                                title="Renk kodu - hex, rgb veya renk adı girebilirsiniz"
+                                placeholder="#FF0000"
+                                title="Renk kodu"
                               />
                             </div>
                           </FormGroup>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                           <FormGroup>
                             <Label>Renk Resmi</Label>
                             <Input

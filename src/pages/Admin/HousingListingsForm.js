@@ -20,6 +20,7 @@ const HousingListingsForm = () => {
     property_type: '',
     room_count: '',
     gross_area: '',
+    max_area: '',
     net_area: '',
     floor_number: '',
     total_floors: '',
@@ -366,13 +367,26 @@ const HousingListingsForm = () => {
                   <Row>
                     <Col md="6">
                       <FormGroup>
-                        <Label>Brüt m²</Label>
+                        <Label>Min m²</Label>
                         <Input
                           type="number"
                           name="gross_area"
                           value={listing.gross_area}
                           onChange={handleInputChange}
-                          placeholder="Brüt m²"
+                          placeholder="Min m²"
+                          disabled={!isEdit}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label>Max m²</Label>
+                        <Input
+                          type="number"
+                          name="max_area"
+                          value={listing.max_area}
+                          onChange={handleInputChange}
+                          placeholder="Max m²"
                           disabled={!isEdit}
                         />
                       </FormGroup>
@@ -872,8 +886,8 @@ const HousingListingsForm = () => {
                     )}
                     {listing.gross_area && (
                       <tr>
-                        <td><strong>Brüt m²:</strong></td>
-                        <td>{listing.gross_area}</td>
+                        <td><strong>M² Aralığı:</strong></td>
+                        <td>{listing.gross_area}{listing.max_area ? ` - ${listing.max_area}` : ''} m²</td>
                       </tr>
                     )}
                     {listing.net_area && (
