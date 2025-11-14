@@ -287,7 +287,12 @@ const SidebarContent = props => {
               </Link>
             </li>
 
-          
+            <li>
+              <Link to="/admin/broadcast-notifications" className="waves-effect">
+                <i className="ti-bell"></i>
+                <span>Toplu Bildirim</span>
+              </Link>
+            </li>
 
             <li>
               <Link to="#" className="has-arrow waves-effect" id="car-management-menu" onClick={toggleTopMenu('car-management-menu')}>

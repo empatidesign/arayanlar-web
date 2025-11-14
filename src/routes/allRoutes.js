@@ -134,6 +134,7 @@ import ListingLimits from "../pages/Admin/ListingLimits";
 import UserManagement from "../pages/Admin/UserManagement";
 import ReportsList from "../pages/Admin/ReportsList";
 import TransactionsManagement from "../pages/Admin/TransactionsManagement";
+import BroadcastNotifications from "../pages/BroadcastNotifications";
 
 import VersionManagement from "../pages/Admin/VersionManagement";
 
@@ -255,6 +256,7 @@ const userRoutes = [
   { path: "/admin/users", component: <UserManagement /> },
   { path: "/admin/transactions", component: <TransactionsManagement /> },
   { path: "/admin/reports", component: <ReportsList /> },
+  { path: "/admin/broadcast-notifications", component: <BroadcastNotifications /> },
   { path: "/admin/versions", component: <VersionManagement /> },
 
   // this route should be at the end of all other routes
