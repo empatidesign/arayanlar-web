@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Card, CardBody, Button, Table, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert, UncontrolledTooltip } from "reactstrap";
-import { Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { get, patch, del } from "../../helpers/backend_helper";
 
@@ -23,6 +22,7 @@ const HousingListingsList = () => {
   const [reapproveModal, setReapproveModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [extendDurationModal, setExtendDurationModal] = useState(false);
+  const [detailModal, setDetailModal] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
@@ -233,6 +233,8 @@ const HousingListingsList = () => {
         return <Badge color="warning">Bekliyor</Badge>;
       case "expired":
         return <Badge color="secondary">Süresi Doldu</Badge>;
+      case "deleted":
+        return <Badge color="dark">Silindi</Badge>;
       default:
         return <Badge color="secondary">{status}</Badge>;
     }
@@ -336,19 +338,25 @@ const HousingListingsList = () => {
                   </Col>
                   <Col md="3">
                     <FormGroup>
-                      <Label>Konut Tipi</Label>
+                      <Label>Konut/Ticari Tipi</Label>
                       <Input
                         type="select"
                         value={filters.property_type}
                         onChange={(e) => setFilters({...filters, property_type: e.target.value, page: 1})}
                       >
                         <option value="">Tümü</option>
-                        <option value="Daire">Daire</option>
-                        <option value="Villa">Villa</option>
-                        <option value="Müstakil Ev">Müstakil Ev</option>
-                        <option value="Dubleks">Dubleks</option>
-                        <option value="Tripleks">Tripleks</option>
-                        <option value="Residence">Residence</option>
+                        <optgroup label="Konut">
+                          <option value="DAİRE">Daire</option>
+                          <option value="VİLLA">Villa</option>
+                        </optgroup>
+                        <optgroup label="Ticari">
+                          <option value="DÜKKAN">Dükkan</option>
+                          <option value="OFİS">Ofis</option>
+                          <option value="FABRİKA">Fabrika</option>
+                          <option value="DEPO">Depo</option>
+                          <option value="ATÖLYE">Atölye</option>
+                          <option value="İMALATHANE">İmalathane</option>
+                        </optgroup>
                       </Input>
                     </FormGroup>
                   </Col>
@@ -466,8 +474,22 @@ const HousingListingsList = () => {
                                 )}
                               </div>
                             </td>
-                            <td>{listing.property_type || "Belirtilmemiş"}</td>
-                            <td>{listing.room_count || "Belirtilmemiş"}</td>
+                            <td>
+                              <div>
+                                {listing.commercial_type ? (
+                                  <>
+                                    <Badge color="info" className="me-1">Ticari</Badge>
+                                    <div className="mt-1">{listing.commercial_type}</div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Badge color="success" className="me-1">Konut</Badge>
+                                    <div className="mt-1">{listing.property_type || "Belirtilmemiş"}</div>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                            <td>{listing.room_count || "-"}</td>
                             <td>
                               <span className="text-success font-weight-bold">
                                 {formatPrice(listing.price, listing.currency)}
@@ -507,18 +529,22 @@ const HousingListingsList = () => {
                                 )}
                               </div>
                             </td>
-                            <td>{getStatusBadge(listing.status)}</td>
+                            <td>{getStatusBadge(listing.display_status || listing.status)}</td>
                             <td>{formatRemainingTime(listing.expires_at, listing.status)}</td>
                             <td>{formatDate(listing.created_at)}</td>
                             <td>
                               <div className="d-flex gap-2">
-                                <Link
-                                  to={`/admin/housing-listings/${listing.id}`}
-                                  className="btn btn-outline-primary btn-sm"
+                                <Button
+                                  color="outline-primary"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedListing(listing);
+                                    setDetailModal(true);
+                                  }}
                                   id={`view-${listing.id}`}
                                 >
                                   <i className="mdi mdi-eye"></i>
-                                </Link>
+                                </Button>
                                 <UncontrolledTooltip placement="top" target={`view-${listing.id}`}>
                                   Detayları Görüntüle
                                 </UncontrolledTooltip>
@@ -862,6 +888,378 @@ const HousingListingsList = () => {
              </Button>
              <Button color="info" onClick={handleExtendDuration} disabled={loading}>
                {loading ? "Uzatılıyor..." : "Süre Uzat (+7 gün)"}
+             </Button>
+           </ModalFooter>
+         </Modal>
+
+         {/* Detay Modal */}
+         <Modal isOpen={detailModal} toggle={() => setDetailModal(false)} size="xl">
+           <ModalHeader toggle={() => setDetailModal(false)}>
+             Konut İlanı Detayları
+           </ModalHeader>
+           <ModalBody>
+             {selectedListing && (
+               <div>
+                 {/* Başlık ve Durum */}
+                 <div className="mb-4">
+                   <div className="d-flex justify-content-between align-items-start">
+                     <div>
+                       <h4 className="mb-2">{selectedListing.title}</h4>
+                       <p className="text-muted mb-2">{selectedListing.description}</p>
+                     </div>
+                     <div>
+                       {getStatusBadge(selectedListing.display_status || selectedListing.status)}
+                     </div>
+                   </div>
+                 </div>
+
+                 {/* Ana Resim */}
+                 {selectedListing.main_image && (
+                   <div className="mb-4">
+                     <img
+                       src={getImageUrl(selectedListing.main_image)}
+                       alt={selectedListing.title}
+                       className="img-fluid rounded"
+                       style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }}
+                     />
+                   </div>
+                 )}
+
+                 {/* Temel Bilgiler */}
+                 <Row className="mb-4">
+                   <Col md="6">
+                     <Card className="border">
+                       <CardBody>
+                         <h5 className="card-title mb-3">Fiyat Bilgileri</h5>
+                         <Table size="sm" borderless>
+                           <tbody>
+                             <tr>
+                               <td className="fw-bold">Fiyat:</td>
+                               <td className="text-success fw-bold">{formatPrice(selectedListing.price, selectedListing.currency)}</td>
+                             </tr>
+                             {selectedListing.monthly_dues && (
+                               <tr>
+                                 <td className="fw-bold">Aylık Aidat:</td>
+                                 <td>{formatPrice(selectedListing.monthly_dues)} TL</td>
+                               </tr>
+                             )}
+                           </tbody>
+                         </Table>
+                       </CardBody>
+                     </Card>
+                   </Col>
+                   <Col md="6">
+                     <Card className="border">
+                       <CardBody>
+                         <h5 className="card-title mb-3">Konum Bilgileri</h5>
+                         <Table size="sm" borderless>
+                           <tbody>
+                             <tr>
+                               <td className="fw-bold">İl:</td>
+                               <td>{selectedListing.province}</td>
+                             </tr>
+                             {selectedListing.district && (
+                               <tr>
+                                 <td className="fw-bold">İlçe:</td>
+                                 <td>{selectedListing.district}</td>
+                               </tr>
+                             )}
+                             {selectedListing.neighborhood && (
+                               <tr>
+                                 <td className="fw-bold">Mahalle:</td>
+                                 <td>{selectedListing.neighborhood}</td>
+                               </tr>
+                             )}
+                           </tbody>
+                         </Table>
+                       </CardBody>
+                     </Card>
+                   </Col>
+                 </Row>
+
+                 {/* Konut Özellikleri */}
+                 <Row className="mb-4">
+                   <Col md="6">
+                     <Card className="border">
+                       <CardBody>
+                         <h5 className="card-title mb-3">Konut Özellikleri</h5>
+                         <Table size="sm" borderless>
+                           <tbody>
+                             <tr>
+                               <td className="fw-bold">Konut Tipi:</td>
+                               <td>
+                                 {selectedListing.commercial_type ? (
+                                   <>
+                                     <Badge color="info" className="me-1">Ticari</Badge>
+                                     {selectedListing.commercial_type}
+                                   </>
+                                 ) : (
+                                   <>
+                                     <Badge color="success" className="me-1">Konut</Badge>
+                                     {selectedListing.property_type || "Belirtilmemiş"}
+                                   </>
+                                 )}
+                               </td>
+                             </tr>
+                             {selectedListing.room_count && (
+                               <tr>
+                                 <td className="fw-bold">Oda Sayısı:</td>
+                                 <td>{selectedListing.room_count}</td>
+                               </tr>
+                             )}
+                             {selectedListing.gross_area && (
+                               <tr>
+                                 <td className="fw-bold">Min m²:</td>
+                                 <td>{selectedListing.gross_area} m²</td>
+                               </tr>
+                             )}
+                             {selectedListing.max_area && (
+                               <tr>
+                                 <td className="fw-bold">Max m²:</td>
+                                 <td>{selectedListing.max_area} m²</td>
+                               </tr>
+                             )}
+                             {selectedListing.net_area && (
+                               <tr>
+                                 <td className="fw-bold">Net m²:</td>
+                                 <td>{selectedListing.net_area} m²</td>
+                               </tr>
+                             )}
+                             {selectedListing.floor_number && (
+                               <tr>
+                                 <td className="fw-bold">Bulunduğu Kat:</td>
+                                 <td>{selectedListing.floor_number}</td>
+                               </tr>
+                             )}
+                             {selectedListing.total_floors && (
+                               <tr>
+                                 <td className="fw-bold">Toplam Kat:</td>
+                                 <td>{selectedListing.total_floors}</td>
+                               </tr>
+                             )}
+                             {selectedListing.building_age && (
+                               <tr>
+                                 <td className="fw-bold">Bina Yaşı:</td>
+                                 <td>{selectedListing.building_age}</td>
+                               </tr>
+                             )}
+                             {selectedListing.heating_type && (
+                               <tr>
+                                 <td className="fw-bold">Isıtma:</td>
+                                 <td>{selectedListing.heating_type}</td>
+                               </tr>
+                             )}
+                             {selectedListing.bathroom_count && (
+                               <tr>
+                                 <td className="fw-bold">Banyo Sayısı:</td>
+                                 <td>{selectedListing.bathroom_count}</td>
+                               </tr>
+                             )}
+                             {selectedListing.deed_status && (
+                               <tr>
+                                 <td className="fw-bold">Tapu Durumu:</td>
+                                 <td>{selectedListing.deed_status}</td>
+                               </tr>
+                             )}
+                             {selectedListing.facade_direction && (
+                               <tr>
+                                 <td className="fw-bold">Cephe Yönü:</td>
+                                 <td>{selectedListing.facade_direction}</td>
+                               </tr>
+                             )}
+                           </tbody>
+                         </Table>
+                       </CardBody>
+                     </Card>
+                   </Col>
+                   <Col md="6">
+                     <Card className="border">
+                       <CardBody>
+                         <h5 className="card-title mb-3">Özellikler</h5>
+                         <div className="d-flex flex-wrap gap-2">
+                           {selectedListing.is_in_site && (
+                             <Badge color="primary" className="p-2">
+                               <i className="mdi mdi-home-city me-1"></i>
+                               Site İçinde {selectedListing.site_name && `(${selectedListing.site_name})`}
+                             </Badge>
+                           )}
+                           {selectedListing.has_balcony && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-balcony me-1"></i>
+                               Balkon
+                             </Badge>
+                           )}
+                           {selectedListing.is_furnished && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-sofa me-1"></i>
+                               Eşyalı
+                             </Badge>
+                           )}
+                           {selectedListing.has_parking && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-car me-1"></i>
+                               Otopark
+                             </Badge>
+                           )}
+                           {selectedListing.has_elevator && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-elevator me-1"></i>
+                               Asansör
+                             </Badge>
+                           )}
+                           {selectedListing.has_security && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-security me-1"></i>
+                               Güvenlik
+                             </Badge>
+                           )}
+                           {selectedListing.has_pool && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-pool me-1"></i>
+                               Havuz
+                             </Badge>
+                           )}
+                           {selectedListing.has_gym && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-dumbbell me-1"></i>
+                               Spor Salonu
+                             </Badge>
+                           )}
+                           {selectedListing.has_garden && (
+                             <Badge color="info" className="p-2">
+                               <i className="mdi mdi-flower me-1"></i>
+                               Bahçe
+                             </Badge>
+                           )}
+                           {selectedListing.is_exchange_suitable && (
+                             <Badge color="success" className="p-2">
+                               <i className="mdi mdi-swap-horizontal me-1"></i>
+                               Takasa Uygun
+                             </Badge>
+                           )}
+                           {selectedListing.is_urgent && (
+                             <Badge color="danger" className="p-2">
+                               <i className="mdi mdi-alert me-1"></i>
+                               Acil İlan
+                             </Badge>
+                           )}
+                         </div>
+                       </CardBody>
+                     </Card>
+                   </Col>
+                 </Row>
+
+                 {/* Kullanıcı ve Tarih Bilgileri */}
+                 <Row className="mb-4">
+                   <Col md="6">
+                     <Card className="border">
+                       <CardBody>
+                         <h5 className="card-title mb-3">İlan Sahibi</h5>
+                         <Table size="sm" borderless>
+                           <tbody>
+                             <tr>
+                               <td className="fw-bold">Ad Soyad:</td>
+                               <td>{selectedListing.user_name || "Bilinmiyor"}</td>
+                             </tr>
+                             {selectedListing.user_phone && (
+                               <tr>
+                                 <td className="fw-bold">Telefon:</td>
+                                 <td>{selectedListing.user_phone}</td>
+                               </tr>
+                             )}
+                             {selectedListing.user_email && (
+                               <tr>
+                                 <td className="fw-bold">E-posta:</td>
+                                 <td>{selectedListing.user_email}</td>
+                               </tr>
+                             )}
+                           </tbody>
+                         </Table>
+                       </CardBody>
+                     </Card>
+                   </Col>
+                   <Col md="6">
+                     <Card className="border">
+                       <CardBody>
+                         <h5 className="card-title mb-3">Tarih Bilgileri</h5>
+                         <Table size="sm" borderless>
+                           <tbody>
+                             <tr>
+                               <td className="fw-bold">Oluşturulma:</td>
+                               <td>{formatDate(selectedListing.created_at)}</td>
+                             </tr>
+                             {selectedListing.updated_at && (
+                               <tr>
+                                 <td className="fw-bold">Güncellenme:</td>
+                                 <td>{formatDate(selectedListing.updated_at)}</td>
+                               </tr>
+                             )}
+                             {selectedListing.expires_at && (
+                               <tr>
+                                 <td className="fw-bold">Bitiş Tarihi:</td>
+                                 <td>{formatDate(selectedListing.expires_at)}</td>
+                               </tr>
+                             )}
+                             <tr>
+                               <td className="fw-bold">Kalan Süre:</td>
+                               <td>{formatRemainingTime(selectedListing.expires_at, selectedListing.status)}</td>
+                             </tr>
+                           </tbody>
+                         </Table>
+                       </CardBody>
+                     </Card>
+                   </Col>
+                 </Row>
+
+                 {/* Red/İptal Nedeni */}
+                 {(selectedListing.rejection_reason || selectedListing.cancellation_reason) && (
+                   <Row className="mb-4">
+                     <Col md="12">
+                       <Card className="border border-warning">
+                         <CardBody>
+                           <h5 className="card-title mb-3">
+                             {selectedListing.rejection_reason ? 'Red Nedeni' : 'İptal Nedeni'}
+                           </h5>
+                           <p className="mb-0">
+                             {selectedListing.rejection_reason || selectedListing.cancellation_reason}
+                           </p>
+                         </CardBody>
+                       </Card>
+                     </Col>
+                   </Row>
+                 )}
+
+                 {/* Diğer Resimler */}
+                 {selectedListing.images && selectedListing.images.length > 0 && (
+                   <Row>
+                     <Col md="12">
+                       <Card className="border">
+                         <CardBody>
+                           <h5 className="card-title mb-3">İlan Resimleri</h5>
+                           <div className="row">
+                             {selectedListing.images.map((image, index) => (
+                               <div key={index} className="col-6 col-md-4 col-lg-3 mb-3">
+                                 <img
+                                   src={getImageUrl(image)}
+                                   alt={`İlan resmi ${index + 1}`}
+                                   className="img-fluid rounded"
+                                   style={{ width: '100%', height: '150px', objectFit: 'cover', cursor: 'pointer' }}
+                                   onClick={() => window.open(getImageUrl(image), '_blank')}
+                                 />
+                               </div>
+                             ))}
+                           </div>
+                         </CardBody>
+                       </Card>
+                     </Col>
+                   </Row>
+                 )}
+               </div>
+             )}
+           </ModalBody>
+           <ModalFooter>
+             <Button color="secondary" onClick={() => setDetailModal(false)}>
+               Kapat
              </Button>
            </ModalFooter>
          </Modal>

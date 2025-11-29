@@ -215,6 +215,8 @@ const CarListingsList = () => {
         return <Badge color="danger">Reddedildi</Badge>;
       case 'expired':
         return <Badge color="secondary">Süresi Doldu</Badge>;
+      case 'deleted':
+        return <Badge color="dark">Silindi</Badge>;
       default:
         return <Badge color="secondary">Bilinmiyor</Badge>;
     }
@@ -415,7 +417,7 @@ const CarListingsList = () => {
                                     </span>
                                   </td>
                                   <td>{listing.location_city}</td>
-                                  <td>{getStatusBadge(listing.status)}</td>
+                                  <td>{getStatusBadge(listing.display_status || listing.status)}</td>
                                   <td>{formatRemainingTime(listing.expires_at, listing.status)}</td>
                                   <td>
                                     <div>
