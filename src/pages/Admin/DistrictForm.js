@@ -26,6 +26,7 @@ const DistrictForm = () => {
   const [success, setSuccess] = useState('');
   const [formData, setFormData] = useState({
     name: '',
+    region: '',
     image: null
   });
   const [currentImage, setCurrentImage] = useState('');
@@ -47,6 +48,7 @@ const DistrictForm = () => {
         const district = response.data;
         setFormData({
           name: district.name || '',
+          region: district.region || '',
           image: null
         });
         setCurrentImage(district.image || '');
@@ -80,6 +82,7 @@ const DistrictForm = () => {
 
       const submitData = new FormData();
       submitData.append('name', formData.name);
+      submitData.append('region', formData.region);
       if (formData.image) {
         submitData.append('image', formData.image);
       }
@@ -182,6 +185,26 @@ const DistrictForm = () => {
                           />
                         </FormGroup>
                       </Col>
+                      <Col md="6">
+                        <FormGroup>
+                          <Label for="region">Bölge *</Label>
+                          <Input
+                            type="select"
+                            id="region"
+                            name="region"
+                            value={formData.region}
+                            onChange={handleInputChange}
+                            required
+                          >
+                            <option value="">Bölge Seçiniz</option>
+                            <option value="ASYA">ASYA</option>
+                            <option value="AVRUPA">AVRUPA</option>
+                          </Input>
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    
+                    <Row>
                       <Col md="6">
                         <FormGroup>
                           <Label for="image">İlçe Resmi</Label>

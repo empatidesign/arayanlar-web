@@ -34,6 +34,7 @@ const DistrictList = () => {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
+    region: '',
     image: null
   });
 
@@ -118,6 +119,7 @@ const DistrictList = () => {
       
       const submitData = new FormData();
       submitData.append('name', formData.name);
+      submitData.append('region', formData.region);
       if (formData.image) {
         submitData.append('image', formData.image);
       }
@@ -133,7 +135,7 @@ const DistrictList = () => {
         setSuccess(editModal ? 'İlçe başarıyla güncellendi' : 'İlçe başarıyla eklendi');
         setAddModal(false);
         setEditModal(false);
-        setFormData({ name: '', image: null });
+        setFormData({ name: '', region: '', image: null });
         setSelectedDistrict(null);
         fetchDistricts();
       } else {
@@ -176,6 +178,7 @@ const DistrictList = () => {
     setSelectedDistrict(district);
     setFormData({
       name: district.name,
+      region: district.region || '',
       image: null
     });
     setEditModal(true);
@@ -248,6 +251,7 @@ const DistrictList = () => {
                             <th>ID</th>
                             <th>Resim</th>
                             <th>İlçe Adı</th>
+                            <th>Bölge</th>
                             <th>Oluşturulma Tarihi</th>
                             <th>İşlemler</th>
                           </tr>
@@ -290,6 +294,15 @@ const DistrictList = () => {
                                         </td>
                                         <td>{district.name}</td>
                                         <td>
+                                          {district.region ? (
+                                            <span className={`badge ${district.region === 'ASYA' ? 'bg-info' : 'bg-success'}`}>
+                                              {district.region}
+                                            </span>
+                                          ) : (
+                                            <span className="text-muted">-</span>
+                                          )}
+                                        </td>
+                                        <td>
                                           {district.created_at ? 
                                             new Date(district.created_at).toLocaleDateString('tr-TR') : 
                                             '-'
@@ -319,7 +332,7 @@ const DistrictList = () => {
                                 ))
                               ) : (
                                 <tr>
-                                  <td colSpan="6" className="text-center">
+                                  <td colSpan="7" className="text-center">
                                     Henüz ilçe bulunmuyor
                                   </td>
                                 </tr>
@@ -354,6 +367,21 @@ const DistrictList = () => {
                     onChange={handleInputChange}
                     required
                   />
+                </FormGroup>
+                <FormGroup>
+                  <Label for="region">Bölge</Label>
+                  <Input
+                    type="select"
+                    id="region"
+                    name="region"
+                    value={formData.region}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Bölge Seçiniz</option>
+                    <option value="ASYA">ASYA</option>
+                    <option value="AVRUPA">AVRUPA</option>
+                  </Input>
                 </FormGroup>
                 <FormGroup>
                   <Label for="image">İlçe Resmi</Label>
@@ -402,6 +430,21 @@ const DistrictList = () => {
                     onChange={handleInputChange}
                     required
                   />
+                </FormGroup>
+                <FormGroup>
+                  <Label for="edit-region">Bölge</Label>
+                  <Input
+                    type="select"
+                    id="edit-region"
+                    name="region"
+                    value={formData.region}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Bölge Seçiniz</option>
+                    <option value="ASYA">ASYA</option>
+                    <option value="AVRUPA">AVRUPA</option>
+                  </Input>
                 </FormGroup>
                 <FormGroup>
                   <Label for="edit-image">İlçe Resmi</Label>
