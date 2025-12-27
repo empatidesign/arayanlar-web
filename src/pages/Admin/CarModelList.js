@@ -12,6 +12,10 @@ const CarModelList = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedModel, setSelectedModel] = useState(null);
   
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
+  
   // Yeni model ekleme modal state'leri
   const [addModal, setAddModal] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
@@ -52,9 +56,12 @@ const CarModelList = () => {
   document.title = "Araba Modelleri Yönetimi | Arayanvar Admin";
 
   useEffect(() => {
-    fetchModels();
     fetchBrands();
   }, []);
+
+  useEffect(() => {
+    fetchModels();
+  }, [activeSearch]);
 
   const onModelDragEnd = async (result) => {
     if (!result.destination) return;
@@ -82,10 +89,16 @@ const CarModelList = () => {
   const fetchModels = async () => {
     try {
       setLoading(true);
-      const response = await get('/api/cars/models');
-      console.log('Models API Response:', response); // Debug log
       
-      // Backend'den gelen response yapısına göre data'yı al
+      const queryParams = new URLSearchParams();
+      if (activeSearch && activeSearch.trim()) {
+        queryParams.append('search', activeSearch.trim());
+      }
+      
+      const url = `/api/cars/models${queryParams.toString() ? `?${queryParams}` : ''}`;
+      const response = await get(url);
+      console.log('Models API Response:', response);
+      
       const modelsData = response.success ? response.data : response;
       setModels(Array.isArray(modelsData) ? modelsData : []);
     } catch (error) {
@@ -114,6 +127,26 @@ const CarModelList = () => {
   const showAlert = (message, color = 'success') => {
     setAlert({ show: true, message, color });
     setTimeout(() => setAlert({ show: false, message: '', color: 'success' }), 3000);
+  };
+
+  // Search fonksiyonları
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  const handleSearch = () => {
+    setActiveSearch(searchTerm);
+  };
+  
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+  
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearch('');
   };
 
   const handleToggleStatus = async (modelId, currentStatus) => {
@@ -462,6 +495,44 @@ const CarModelList = () => {
                       <i className="mdi mdi-plus me-1"></i>
                       Yeni Model Ekle
                     </Button>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div className="mb-3">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="input-group">
+                          <Input
+                            type="text"
+                            placeholder="Model adı, marka veya açıklamaya göre ara..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            onKeyPress={handleSearchKeyPress}
+                          />
+                          {searchTerm && (
+                            <Button
+                              color="secondary"
+                              onClick={handleClearSearch}
+                              title="Aramayı temizle"
+                            >
+                              <i className="fas fa-times"></i>
+                            </Button>
+                          )}
+                          <Button 
+                            color="primary" 
+                            onClick={handleSearch}
+                            title="Ara"
+                          >
+                            <i className="fas fa-search"></i>
+                          </Button>
+                        </div>
+                        {activeSearch && (
+                          <small className="text-muted">
+                            "{activeSearch}" için {models.length} sonuç bulundu
+                          </small>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {loading ? (

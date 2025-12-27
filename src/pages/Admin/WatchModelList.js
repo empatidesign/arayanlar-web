@@ -30,11 +30,18 @@ const WatchModelList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalModels, setTotalModels] = useState(0);
   const [limit] = useState(20);
+  
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeSearch, setActiveSearch] = useState(''); // Aktif arama terimi
+
+  useEffect(() => {
+    fetchBrands();
+  }, []);
 
   useEffect(() => {
     fetchModels();
-    fetchBrands();
-  }, [currentPage]);
+  }, [currentPage, activeSearch]);
 
   const fetchModels = async () => {
     try {
@@ -45,6 +52,11 @@ const WatchModelList = () => {
         page: currentPage,
         limit: limit
       });
+      
+      // Aktif arama terimini kullan
+      if (activeSearch && activeSearch.trim()) {
+        queryParams.append('search', activeSearch.trim());
+      }
       
       const response = await get(`/api/watches/models?${queryParams}`);
       console.log('Models response:', response);
@@ -74,6 +86,31 @@ const WatchModelList = () => {
   // Sayfa değişikliklerini handle et
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+  
+  // Search değişikliklerini handle et
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  // Arama butonuna tıklandığında
+  const handleSearch = () => {
+    setActiveSearch(searchTerm);
+    setCurrentPage(1);
+  };
+  
+  // Enter tuşuna basıldığında arama yap
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+  
+  // Search temizle
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearch('');
+    setCurrentPage(1);
   };
 
   // Pagination render
@@ -549,6 +586,45 @@ const WatchModelList = () => {
             <Card>
               <CardBody>
                 <CardTitle className="h4">Saat Modelleri Listesi</CardTitle>
+                
+                {/* Search Bar */}
+                <div className="mb-3">
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="input-group">
+                        <Input
+                          type="text"
+                          placeholder="Model adı, marka, model kodu veya açıklamaya göre ara..."
+                          value={searchTerm}
+                          onChange={handleSearchChange}
+                          onKeyPress={handleSearchKeyPress}
+                        />
+                        {searchTerm && (
+                          <Button
+                            color="secondary"
+                            onClick={handleClearSearch}
+                            title="Aramayı temizle"
+                          >
+                            <i className="fas fa-times"></i>
+                          </Button>
+                        )}
+                        <Button 
+                          color="primary" 
+                          onClick={handleSearch}
+                          title="Ara"
+                        >
+                          <i className="fas fa-search"></i>
+                        </Button>
+                      </div>
+                      {activeSearch && (
+                        <small className="text-muted">
+                          "{activeSearch}" için {totalModels} sonuç bulundu
+                        </small>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
                 <div className="table-responsive">
                   <Table className="table-nowrap mb-0">
                     <thead>

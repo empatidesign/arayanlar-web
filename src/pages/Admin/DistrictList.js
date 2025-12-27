@@ -37,17 +37,27 @@ const DistrictList = () => {
     region: '',
     image: null
   });
+  
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
 
   useEffect(() => {
     fetchDistricts();
-  }, []);
+  }, [activeSearch]);
 
   const fetchDistricts = async () => {
     try {
       setLoading(true);
       setError('');
       
-      const response = await get('/api/districts');
+      const queryParams = new URLSearchParams();
+      if (activeSearch && activeSearch.trim()) {
+        queryParams.append('search', activeSearch.trim());
+      }
+      
+      const url = `/api/districts${queryParams.toString() ? `?${queryParams}` : ''}`;
+      const response = await get(url);
       
       if (response.success) {
         setDistricts(response.data || []);
@@ -108,6 +118,26 @@ const DistrictList = () => {
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  // Search fonksiyonları
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  const handleSearch = () => {
+    setActiveSearch(searchTerm);
+  };
+  
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+  
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearch('');
   };
 
   const handleSubmit = async (e) => {
@@ -218,6 +248,44 @@ const DistrictList = () => {
                         <i className="mdi mdi-form-select me-1"></i>
                         Form Sayfası
                       </Link>
+                    </div>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div className="mb-3">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="input-group">
+                          <Input
+                            type="text"
+                            placeholder="İlçe adı veya bölgeye göre ara..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            onKeyPress={handleSearchKeyPress}
+                          />
+                          {searchTerm && (
+                            <Button
+                              color="secondary"
+                              onClick={handleClearSearch}
+                              title="Aramayı temizle"
+                            >
+                              <i className="fas fa-times"></i>
+                            </Button>
+                          )}
+                          <Button 
+                            color="primary" 
+                            onClick={handleSearch}
+                            title="Ara"
+                          >
+                            <i className="fas fa-search"></i>
+                          </Button>
+                        </div>
+                        {activeSearch && (
+                          <small className="text-muted">
+                            "{activeSearch}" için {districts.length} sonuç bulundu
+                          </small>
+                        )}
+                      </div>
                     </div>
                   </div>
 
