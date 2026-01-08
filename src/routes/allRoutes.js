@@ -135,6 +135,7 @@ import UserManagement from "../pages/Admin/UserManagement";
 import ReportsList from "../pages/Admin/ReportsList";
 import TransactionsManagement from "../pages/Admin/TransactionsManagement";
 import BroadcastNotifications from "../pages/BroadcastNotifications";
+import AppContentManagement from "../pages/Admin/AppContentManagement";
 
 import VersionManagement from "../pages/Admin/VersionManagement";
 
@@ -258,6 +259,7 @@ const userRoutes = [
   { path: "/admin/reports", component: <ReportsList /> },
   { path: "/admin/broadcast-notifications", component: <BroadcastNotifications /> },
   { path: "/admin/versions", component: <VersionManagement /> },
+  { path: "/admin/app-content", component: <AppContentManagement /> },
 
   // this route should be at the end of all other routes
   { path: "/", component: <Dashboard /> },

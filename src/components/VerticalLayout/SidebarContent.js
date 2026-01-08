@@ -370,6 +370,13 @@ const SidebarContent = props => {
               </Link>
             </li>
 
+            <li>
+              <Link to="/admin/app-content" className="waves-effect">
+                <i className="ti-file"></i>
+                <span>Uygulama İçerikleri</span>
+              </Link>
+            </li>
+
             
           </ul>
         </div>
