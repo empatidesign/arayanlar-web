@@ -30,8 +30,10 @@ const VersionManagement = () => {
   const [modal, setModal] = useState(false);
   const [editingVersion, setEditingVersion] = useState(null);
   const [formData, setFormData] = useState({
-    current_version: '',
-    minimum_version: '',
+    current_version_ios: '',
+    minimum_version_ios: '',
+    current_version_android: '',
+    minimum_version_android: '',
     force_update: true,
     update_message: '',
     download_url_android: 'https://play.google.com/store/apps/details?id=com.arayanvar.app',
@@ -66,8 +68,10 @@ const VersionManagement = () => {
     if (!modal) {
       setEditingVersion(null);
       setFormData({
-        current_version: '',
-        minimum_version: '',
+        current_version_ios: '',
+        minimum_version_ios: '',
+        current_version_android: '',
+        minimum_version_android: '',
         force_update: true,
         update_message: '',
         download_url_android: 'https://play.google.com/store/apps/details?id=com.arayanvar.app',
@@ -80,8 +84,10 @@ const VersionManagement = () => {
   const handleEdit = (version) => {
     setEditingVersion(version);
     setFormData({
-      current_version: version.current_version,
-      minimum_version: version.minimum_version,
+      current_version_ios: version.current_version_ios || '',
+      minimum_version_ios: version.minimum_version_ios || '',
+      current_version_android: version.current_version_android || '',
+      minimum_version_android: version.minimum_version_android || '',
       force_update: version.force_update,
       update_message: version.update_message || '',
       download_url_android: version.download_url_android || '',
@@ -102,8 +108,9 @@ const VersionManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.current_version || !formData.minimum_version) {
-      toastr.error('Geçerli versiyon ve minimum versiyon gerekli');
+    if (!formData.current_version_ios || !formData.minimum_version_ios || 
+        !formData.current_version_android || !formData.minimum_version_android) {
+      toastr.error('iOS ve Android için geçerli versiyon ve minimum versiyon gerekli');
       return;
     }
 
@@ -180,8 +187,8 @@ const VersionManagement = () => {
                       <thead>
                         <tr>
                           <th>ID</th>
-                          <th>Geçerli Versiyon</th>
-                          <th>Minimum Versiyon</th>
+                          <th>iOS Versiyon</th>
+                          <th>Android Versiyon</th>
                           <th>Zorunlu Güncelleme</th>
                           <th>Durum</th>
                           <th>Oluşturma Tarihi</th>
@@ -193,9 +200,17 @@ const VersionManagement = () => {
                           <tr key={version.id}>
                             <td>{version.id}</td>
                             <td>
-                              <strong>{version.current_version}</strong>
+                              <div>
+                                <strong>Güncel:</strong> {version.current_version_ios}<br/>
+                                <small className="text-muted">Min: {version.minimum_version_ios}</small>
+                              </div>
                             </td>
-                            <td>{version.minimum_version}</td>
+                            <td>
+                              <div>
+                                <strong>Güncel:</strong> {version.current_version_android}<br/>
+                                <small className="text-muted">Min: {version.minimum_version_android}</small>
+                              </div>
+                            </td>
                             <td>
                               <Badge 
                                 color={version.force_update ? 'danger' : 'success'}
@@ -264,16 +279,22 @@ const VersionManagement = () => {
           </ModalHeader>
           <Form onSubmit={handleSubmit}>
             <ModalBody>
+              <Alert color="info" className="mb-3">
+                <i className="mdi mdi-information me-2"></i>
+                iOS ve Android için farklı versiyon numaraları belirleyebilirsiniz.
+              </Alert>
+              
+              <h6 className="mb-3">iOS Versiyonları</h6>
               <Row>
                 <Col md={6}>
                   <FormGroup>
-                    <Label for="current_version">Geçerli Versiyon *</Label>
+                    <Label for="current_version_ios">iOS Geçerli Versiyon *</Label>
                     <Input
                       type="text"
-                      name="current_version"
-                      id="current_version"
-                      placeholder="Örn: 1.0.0"
-                      value={formData.current_version}
+                      name="current_version_ios"
+                      id="current_version_ios"
+                      placeholder="Örn: 1.0.1"
+                      value={formData.current_version_ios}
                       onChange={handleInputChange}
                       required
                     />
@@ -281,13 +302,13 @@ const VersionManagement = () => {
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label for="minimum_version">Minimum Versiyon *</Label>
+                    <Label for="minimum_version_ios">iOS Minimum Versiyon *</Label>
                     <Input
                       type="text"
-                      name="minimum_version"
-                      id="minimum_version"
+                      name="minimum_version_ios"
+                      id="minimum_version_ios"
                       placeholder="Örn: 1.0.0"
-                      value={formData.minimum_version}
+                      value={formData.minimum_version_ios}
                       onChange={handleInputChange}
                       required
                     />
@@ -295,6 +316,43 @@ const VersionManagement = () => {
                 </Col>
               </Row>
 
+              <hr className="my-3" />
+
+              <h6 className="mb-3">Android Versiyonları</h6>
+              <Row>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label for="current_version_android">Android Geçerli Versiyon *</Label>
+                    <Input
+                      type="text"
+                      name="current_version_android"
+                      id="current_version_android"
+                      placeholder="Örn: 1.0.1"
+                      value={formData.current_version_android}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label for="minimum_version_android">Android Minimum Versiyon *</Label>
+                    <Input
+                      type="text"
+                      name="minimum_version_android"
+                      id="minimum_version_android"
+                      placeholder="Örn: 1.0.0"
+                      value={formData.minimum_version_android}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+
+              <hr className="my-3" />
+
+              <h6 className="mb-3">İndirme Linkleri</h6>
               <Row>
                 <Col md={6}>
                   <FormGroup>
@@ -323,6 +381,21 @@ const VersionManagement = () => {
                   </FormGroup>
                 </Col>
               </Row>
+
+              <FormGroup>
+                <Label for="update_message">Güncelleme Mesajı</Label>
+                <Input
+                  type="textarea"
+                  name="update_message"
+                  id="update_message"
+                  placeholder="Kullanıcılara gösterilecek güncelleme mesajı..."
+                  value={formData.update_message}
+                  onChange={handleInputChange}
+                  rows="3"
+                />
+              </FormGroup>
+
+              <hr className="my-3" />
 
               <Row>
                 <Col md={6}>
