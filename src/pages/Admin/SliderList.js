@@ -32,10 +32,8 @@ const SliderList = () => {
   const fetchSliders = async () => {
     try {
       const data = await get('/api/sliders');
-      console.log('API Response:', data);
       setSliders(data.data || []);
     } catch (error) {
-      console.error('Slider listesi yüklenirken hata:', error);
     } finally {
       setLoading(false);
     }
@@ -52,7 +50,6 @@ const SliderList = () => {
       setDeleteModal(false);
       setSelectedSlider(null);
     } catch (error) {
-      console.error('Slider silinirken hata:', error);
     }
   };
 
@@ -69,7 +66,6 @@ const SliderList = () => {
         s.id === slider.id ? { ...s, is_active: !s.is_active } : s
       ));
     } catch (error) {
-      console.error('Slider durumu güncellenirken hata:', error);
     }
   };
 
@@ -81,7 +77,6 @@ const SliderList = () => {
 
       fetchSliders(); // Listeyi yenile
     } catch (error) {
-      console.error('Slider sırası güncellenirken hata:', error);
     }
   };
 
@@ -141,7 +136,6 @@ const SliderList = () => {
       resetAddModal();
       fetchSliders(); // Listeyi yenile
     } catch (error) {
-      console.error('Slider eklenirken hata:', error);
       alert('Slider eklenirken hata oluştu.');
     } finally {
       setAddLoading(false);
@@ -207,7 +201,6 @@ const SliderList = () => {
                                       className="img-thumbnail"
                                       style={{ width: '80px', height: '50px', objectFit: 'cover' }}
                                       onError={(e) => {
-                                        console.log('Resim yüklenemedi:', slider.image_url);
                                         e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA4MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yNSAyMEwzNSAzMEw0NSAyMEw1NSAzMEgyNVYyMFoiIGZpbGw9IiNEREREREQiLz4KPHN2Zz4K';
                                       }}
                                     />

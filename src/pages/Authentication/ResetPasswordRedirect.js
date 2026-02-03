@@ -35,7 +35,6 @@ const ResetPasswordRedirect = () => {
     } catch (e) {
       // Sessizce yut; kullanıcı fallback ile devam eder
       // eslint-disable-next-line no-console
-      console.error("Deep link yönlendirme hatası:", e);
     }
   }, []);
 

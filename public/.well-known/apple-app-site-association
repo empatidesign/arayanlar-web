@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "YCCXPGU7AY.com.sudofor.arayanvar",
+        "paths": [
+          "/listing/car/*",
+          "/listing/watch/*",
+          "/listing/housing/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "YCCXPGU7AY.com.sudofor.arayanvar"
+    ]
+  }
+}

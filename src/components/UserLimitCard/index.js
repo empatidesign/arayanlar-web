@@ -20,7 +20,6 @@ const UserLimitCard = () => {
         setError(response.message || 'Limit bilgisi alınamadı');
       }
     } catch (err) {
-      console.error('Limit bilgisi alınırken hata:', err);
       setError('Limit bilgisi alınırken hata oluştu');
     } finally {
       setLoading(false);

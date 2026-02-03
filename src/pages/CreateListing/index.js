@@ -52,7 +52,6 @@ const CreateListing = () => {
       setLimitInfo(response);
       setLimitError('');
     } catch (error) {
-      console.error('Limit bilgisi alınamadı:', error);
       setLimitError('Limit bilgisi yüklenemedi');
     } finally {
       setLimitLoading(false);
@@ -82,7 +81,6 @@ const CreateListing = () => {
 
     try {
       // Burada API çağrısı yapılacak
-      console.log('İlan veriliyor:', listing);
       
       // Simüle edilmiş başarı
       setTimeout(() => {
@@ -104,7 +102,6 @@ const CreateListing = () => {
       }, 2000);
       
     } catch (error) {
-      console.error('İlan oluşturma hatası:', error);
       setError('İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
       setLoading(false);
     }

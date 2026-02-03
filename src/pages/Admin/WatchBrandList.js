@@ -28,7 +28,6 @@ const WatchBrandList = () => {
         setBrands(response.data);
       }
     } catch (error) {
-      console.error('Saat markaları yüklenirken hata:', error);
       showAlert('Saat markaları yüklenirken hata oluştu', 'danger');
     } finally {
       setLoading(false);
@@ -50,7 +49,6 @@ const WatchBrandList = () => {
         showAlert(response.message || 'Silme işlemi başarısız', 'danger');
       }
     } catch (error) {
-      console.error('Silme hatası:', error);
       
       // Backend'den gelen hata mesajını göster
       let errorMessage = 'Silme işlemi sırasında hata oluştu';
@@ -99,7 +97,6 @@ const WatchBrandList = () => {
         showAlert(response.message || 'İşlem başarısız', 'danger');
       }
     } catch (error) {
-      console.error('Form gönderme hatası:', error);
       showAlert('İşlem sırasında hata oluştu', 'danger');
     }
   };
@@ -153,7 +150,6 @@ const WatchBrandList = () => {
         showAlert('Sıralama güncellendi', 'success');
       }
     } catch (error) {
-      console.error('Saat markası sıralama hatası:', error);
       setBrands(previous);
       const msg = error?.response?.data?.message || 'Sıralama kaydedilirken hata oluştu';
       showAlert(msg, 'danger');

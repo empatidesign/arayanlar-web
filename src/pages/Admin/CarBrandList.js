@@ -56,9 +56,7 @@ const CarBrandList = () => {
       });
       showAlert('Marka sıralaması güncellendi');
     } catch (error) {
-      console.error('Marka sıralaması güncellenirken hata:', error);
       if (error.response) {
-        console.error('Backend hata yanıtı:', error.response.status, error.response.data);
       }
       showAlert('Marka sıralaması güncellenemedi', 'danger');
       setBrands(previous);
@@ -69,13 +67,11 @@ const CarBrandList = () => {
     try {
       setLoading(true);
       const response = await get('/api/cars/brands');
-      console.log('API Response:', response); // Debug log
       
       // Backend'den gelen response yapısına göre data'yı al
       const brandsData = response.success ? response.data : response;
       setBrands(Array.isArray(brandsData) ? brandsData : []);
     } catch (error) {
-      console.error('Markalar yüklenirken hata:', error);
       setBrands([]);
       showAlert('Markalar yüklenirken hata oluştu', 'danger');
     } finally {
@@ -106,7 +102,6 @@ const CarBrandList = () => {
       setSelectedBrand(null);
       showAlert('Marka başarıyla silindi');
     } catch (error) {
-      console.error('Marka silinirken hata:', error);
       
       // Backend'den gelen hata mesajını göster
       let errorMessage = 'Marka silinirken hata oluştu';
@@ -157,7 +152,6 @@ const CarBrandList = () => {
       setImagePreview(null);
       showAlert('Marka başarıyla eklendi');
     } catch (error) {
-      console.error('Marka eklenirken hata:', error);
       showAlert('Marka eklenirken hata oluştu', 'danger');
     } finally {
       setAddLoading(false);
@@ -186,7 +180,6 @@ const CarBrandList = () => {
       setEditImagePreview(null);
       showAlert('Marka başarıyla güncellendi');
     } catch (error) {
-      console.error('Marka güncellenirken hata:', error);
       showAlert('Marka güncellenirken hata oluştu', 'danger');
     } finally {
       setEditLoading(false);

@@ -60,7 +60,6 @@ const SliderForm = () => {
       });
       setCurrentImage(data.data.image_url);
     } catch (error) {
-      console.error('Slider yüklenirken hata:', error);
       setError('Slider bilgileri yüklenirken hata oluştu.');
     }
   };
@@ -122,7 +121,6 @@ const SliderForm = () => {
         navigate('/admin/sliders');
       }, 2000);
     } catch (error) {
-      console.error('Form gönderilirken hata:', error);
       setError('İşlem sırasında hata oluştu.');
     } finally {
       setLoading(false);
@@ -238,7 +236,6 @@ const SliderForm = () => {
                                 className="img-thumbnail"
                                 style={{ maxWidth: '300px', maxHeight: '200px' }}
                                 onError={(e) => {
-                                  console.log('Mevcut resim yüklenemedi:', currentImage);
                                   e.target.style.display = 'none';
                                   e.target.nextSibling.style.display = 'block';
                                 }}

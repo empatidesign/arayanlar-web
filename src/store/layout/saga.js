@@ -23,7 +23,6 @@ function saveThemeToLocalStorage(key, value) {
   try {
     localStorage.setItem(`theme_${key}`, value);
   } catch (error) {
-    console.error("Error saving theme to localStorage:", error);
   }
 }
 
@@ -35,7 +34,6 @@ function loadThemeFromLocalStorage(key, defaultValue) {
     const saved = localStorage.getItem(`theme_${key}`);
     return saved !== null ? saved : defaultValue;
   } catch (error) {
-    console.error("Error loading theme from localStorage:", error);
     return defaultValue;
   }
 }

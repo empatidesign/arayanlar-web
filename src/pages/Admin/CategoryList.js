@@ -33,7 +33,6 @@ const CategoryList = () => {
       const data = await get('/api/sections');
       setCategories(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Kategoriler yüklenirken hata:', error);
       setCategories([]);
     } finally {
       setLoading(false);
@@ -49,7 +48,6 @@ const CategoryList = () => {
       setDeleteModal(false);
       setSelectedCategory(null);
     } catch (error) {
-      console.error('Kategori silinirken hata:', error);
       alert('Kategori silinirken hata oluştu. Bu kategoriye bağlı markalar veya ilanlar olabilir.');
     }
   };
@@ -124,7 +122,6 @@ const CategoryList = () => {
         fetchCategories(); // Listeyi yenile
       }
     } catch (error) {
-      console.error('Kategori eklenirken hata:', error);
       alert('Kategori eklenirken hata oluştu.');
     } finally {
       setAddLoading(false);

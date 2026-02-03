@@ -42,7 +42,6 @@ const BroadcastNotifications = () => {
         setStats(response.data);
       }
     } catch (error) {
-      console.error('İstatistik yükleme hatası:', error);
     }
   };
 
@@ -75,7 +74,6 @@ const BroadcastNotifications = () => {
         setError(response.message || 'Bildirim gönderilemedi');
       }
     } catch (error) {
-      console.error('Bildirim gönderme hatası:', error);
       setError('Bildirim gönderilirken bir hata oluştu');
     } finally {
       setLoading(false);

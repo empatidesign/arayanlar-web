@@ -77,7 +77,6 @@ const LimitNotification = ({
       }
 
     } catch (error) {
-      console.error('Limit kontrolü yapılamadı:', error);
     }
   };
 

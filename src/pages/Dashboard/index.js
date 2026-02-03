@@ -41,7 +41,6 @@ const Dashboard = props => {
           // Token'ı data objesi içinden al
           token = parsedUser.data?.token || parsedUser.token || parsedUser.accessToken;
         } catch (parseError) {
-          console.error('AuthUser parse hatası:', parseError);
         }
       }
       
@@ -54,13 +53,10 @@ const Dashboard = props => {
        
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          console.log(`${key}:`, localStorage.getItem(key));
         }
         return;
       }
 
-      console.log('API çağrısı başlatılıyor...');
-      console.log('Token mevcut:', token.substring(0, 20) + '...');
       
       const response = await fetch('http://localhost:3000/api/admin/dashboard/stats', {
         method: 'GET',
@@ -70,19 +66,15 @@ const Dashboard = props => {
         }
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers.get('content-type'));
       
       if (response.ok) {
         const contentType = response.headers.get('content-type');
         
         if (contentType && contentType.includes('application/json')) {
           const result = await response.json();
-          console.log('API Response:', result);
           
           if (result.success) {
             const data = result.data;
-            console.log('Data from API:', data);
             
             setStats({
               users: data.users?.total || 0,
@@ -94,20 +86,15 @@ const Dashboard = props => {
               housingListings: data.housingListings || { total: 0, pending: 0, approved: 0, rejected: 0, expired: 0 }
             });
             
-            console.log('Stats başarıyla güncellendi');
           } else {
-            console.error('API başarısız response:', result.message);
           }
         } else {
           const textResponse = await response.text();
-          console.error('API HTML response döndü:', textResponse.substring(0, 200));
         }
       } else {
         const errorText = await response.text();
-        console.error('API çağrısı başarısız:', response.status, response.statusText, errorText);
       }
     } catch (error) {
-      console.error('Dashboard istatistikleri yüklenirken hata:', error);
     }
   };
 

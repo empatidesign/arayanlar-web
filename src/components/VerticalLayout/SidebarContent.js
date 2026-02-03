@@ -209,7 +209,6 @@ const SidebarContent = props => {
         if (sub) sub.classList.add('mm-show');
       }
     } catch (err) {
-      console.error('Sidebar toggle error:', err);
     }
   }, []);
 

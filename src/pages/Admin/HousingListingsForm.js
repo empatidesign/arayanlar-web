@@ -75,7 +75,6 @@ const HousingListingsForm = () => {
         setError(response.message || 'Konut ilanı yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('Konut ilanı yüklenirken hata:', error);
       setError('Konut ilanı yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -109,7 +108,6 @@ const HousingListingsForm = () => {
         setError(response.message || 'Konut ilanı güncellenirken hata oluştu');
       }
     } catch (error) {
-      console.error('Konut ilanı güncellenirken hata:', error);
       setError('Konut ilanı güncellenirken hata oluştu');
     } finally {
       setLoading(false);

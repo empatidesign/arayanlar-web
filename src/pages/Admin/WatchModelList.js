@@ -46,7 +46,6 @@ const WatchModelList = () => {
   const fetchModels = async () => {
     try {
       setLoading(true);
-      console.log('Fetching models...');
       
       const queryParams = new URLSearchParams({
         page: currentPage,
@@ -59,10 +58,8 @@ const WatchModelList = () => {
       }
       
       const response = await get(`/api/watches/models?${queryParams}`);
-      console.log('Models response:', response);
       
       if (response.success) {
-        console.log('Models data:', response.models);
         setModels(response.models || []);
         
         // Pagination bilgilerini set et
@@ -71,11 +68,9 @@ const WatchModelList = () => {
           setTotalModels(response.pagination.total || 0);
         }
       } else {
-        console.error('Response not successful:', response);
         setModels([]);
       }
     } catch (error) {
-      console.error('Saat modelleri yüklenirken hata:', error);
       showAlert('Saat modelleri yüklenirken hata oluştu', 'danger');
       setModels([]); // Hata durumunda boş array set et
     } finally {
@@ -172,7 +167,6 @@ const WatchModelList = () => {
         setBrands(response.data);
       }
     } catch (error) {
-      console.error('Saat markaları yüklenirken hata:', error);
     }
   };
 
@@ -191,7 +185,6 @@ const WatchModelList = () => {
         showAlert(response.message || 'Silme işlemi başarısız', 'danger');
       }
     } catch (error) {
-      console.error('Silme hatası:', error);
       showAlert('Silme işlemi sırasında hata oluştu', 'danger');
     }
     setDeleteModal(false);
@@ -282,7 +275,6 @@ const WatchModelList = () => {
         showAlert(response.message || 'Durum güncelleme başarısız', 'danger');
       }
     } catch (error) {
-      console.error('Durum güncelleme hatası:', error);
       showAlert('Durum güncelleme sırasında hata oluştu', 'danger');
     }
   };
@@ -307,7 +299,6 @@ const WatchModelList = () => {
         showAlert('Sıralama güncellendi', 'success');
       }
     } catch (error) {
-      console.error('Saat modeli sıralama hatası:', error);
       setModels(previous);
       const msg = error?.response?.data?.message || 'Sıralama kaydedilirken hata oluştu';
       showAlert(msg, 'danger');
@@ -317,9 +308,7 @@ const WatchModelList = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    console.log('Form submit başladı, editModal:', editModal);
-    console.log('FormData:', formData);
-    console.log('SelectedModel:', selectedModel);
+
     
     if (!formData.brand_id || !formData.name.trim()) {
       showAlert('Marka ve model adı gerekli', 'danger');
@@ -339,14 +328,12 @@ const WatchModelList = () => {
 
       // Renk verilerini ekle
       if (formData.colors && formData.colors.length > 0) {
-        console.log('Processing colors:', formData.colors);
         
         // Process colors and upload color images
         const processedColors = [];
         
         for (let i = 0; i < formData.colors.length; i++) {
           const color = formData.colors[i];
-          console.log(`Processing color ${i}:`, color);
           
           const processedColor = {
             name: color.name,
@@ -358,20 +345,17 @@ const WatchModelList = () => {
           // Eğer mevcut bir resim yolu varsa (string), onu koru
           if (color.image && typeof color.image === 'string') {
             processedColor.image = color.image;
-            console.log(`Color ${i} has existing image:`, color.image);
           }
           // Eğer yeni bir dosya yüklendiyse (File object)
           else if (color.image && typeof color.image !== 'string') {
             const colorImageKey = `color_image_${i}`;
             submitData.append(colorImageKey, color.image);
             processedColor.image = colorImageKey; // Backend'de bu key ile dosya bulunacak
-            console.log(`Color ${i} has new file, key:`, colorImageKey);
           }
           
           processedColors.push(processedColor);
         }
         
-        console.log('Processed colors:', processedColors);
         submitData.append('colors', JSON.stringify(processedColors));
       }
 
@@ -379,29 +363,23 @@ const WatchModelList = () => {
 
       let response;
       if (editModal) {
-        console.log('PUT isteği gönderiliyor, URL:', `/api/watches/models/${selectedModel.id}`);
         response = await put(`/api/watches/models/${selectedModel.id}`, submitData);
       } else {
-        console.log('POST isteği gönderiliyor');
         response = await post('/api/watches/models', submitData);
       }
 
-      console.log('API Response:', response);
 
       if (response.success) {
         showAlert(
           editModal ? 'Saat modeli başarıyla güncellendi' : 'Saat modeli başarıyla eklendi',
           'success'
         );
-        console.log('Başarılı, fetchModels çağrılıyor...');
         fetchModels();
         resetForm();
       } else {
-        console.error('API response başarısız:', response);
         showAlert(response.message || 'İşlem başarısız', 'danger');
       }
     } catch (error) {
-      console.error('Form gönderme hatası:', error);
       // Backend'den gelen hata mesajını göster
       const errorMessage = error.response?.data?.message || error.message || 'İşlem sırasında hata oluştu';
       showAlert(errorMessage, 'danger');
@@ -427,9 +405,7 @@ const WatchModelList = () => {
   };
 
   const openEditModal = (model) => {
-    console.log('Model data:', model); // Debug için
-    console.log('Model images:', model.images); // Images debug
-    console.log('Model colors:', model.colors); // Colors debug
+
     setSelectedModel(model);
     
     // Verileri işle
@@ -451,9 +427,7 @@ const WatchModelList = () => {
           }
         }
       }
-      console.log('Processed images:', parsedImages);
     } catch (e) {
-      console.error('Images parse error:', e);
       parsedImages = [];
     }
     
@@ -480,9 +454,7 @@ const WatchModelList = () => {
         gender: color.gender || 'unisex' // Eğer gender yoksa default unisex
       }));
       
-      console.log('Processed colors:', parsedColors);
     } catch (e) {
-      console.error('Colors parse error:', e);
       parsedColors = [];
     }
     
@@ -502,13 +474,8 @@ const WatchModelList = () => {
         }
       }
     } catch (e) {
-      console.error('Specifications parse error:', e);
       parsedSpecifications = model.specifications || '';
     }
-    
-    console.log('Final formData images:', parsedImages);
-      console.log('Final formData colors:', parsedColors);
-      console.log('Colors with images:', parsedColors.map(c => ({ name: c.name, image: c.image, originalImage: c.originalImage })));
     
     setFormData({
       brand_id: model.brand_id || '',
@@ -1123,7 +1090,6 @@ const WatchModelList = () => {
                                   alt={`${color.name} renk önizleme`}
                                   style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
                                   onError={(e) => {
-                                    console.log('Image load error:', color.originalImage);
                                     e.target.style.display = 'none';
                                   }}
                                 />

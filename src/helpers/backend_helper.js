@@ -52,12 +52,9 @@ axiosApi.interceptors.response.use(
 // Auth API calls
 export const postJwtLogin = async (data) => {
   try {
-    console.log('Login isteği gönderiliyor:', data);
     const response = await axiosApi.post('/api/auth/login', data);
-    console.log('Login başarılı:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Login hatası:', error);
     if (error.response) {
       throw error.response.data?.message || 'Login failed';
     } else if (error.request) {

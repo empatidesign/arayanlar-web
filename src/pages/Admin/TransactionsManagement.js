@@ -97,22 +97,18 @@ const TransactionsManagement = () => {
         ...(dateFilter && { date: dateFilter })
       });
 
-      console.log('API çağrısı yapılıyor:', `${API_BASE_URL}/api/admin/transactions?${queryParams}`);
       
       const response = await fetch(`${API_BASE_URL}/api/admin/transactions?${queryParams}`, {
         headers: getHeaders()
       });
 
-      console.log('API yanıtı:', response.status, response.statusText);
 
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('API hatası:', errorData);
         throw new Error(`İşlemler getirilemedi: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log('API verisi:', data);
       
       // API'den gelen veri yapısına göre güncelle
       if (data.success && data.data) {
@@ -125,7 +121,6 @@ const TransactionsManagement = () => {
         setTotalTransactions(0);
       }
     } catch (err) {
-      console.error('Fetch hatası:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -135,25 +130,20 @@ const TransactionsManagement = () => {
   // İstatistikleri getir
   const fetchStats = async () => {
     try {
-      console.log('Stats API çağrısı yapılıyor:', `${API_BASE_URL}/api/admin/transactions/stats`);
       
       const response = await fetch(`${API_BASE_URL}/api/admin/transactions/stats`, {
         headers: getHeaders()
       });
 
-      console.log('Stats API yanıtı:', response.status, response.statusText);
 
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('Stats API hatası:', errorData);
         throw new Error('İstatistikler getirilemedi');
       }
 
       const data = await response.json();
-      console.log('Stats API verisi:', data);
       setStats(data);
     } catch (err) {
-      console.error('İstatistik hatası:', err);
     }
   };
 

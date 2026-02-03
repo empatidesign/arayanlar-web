@@ -52,7 +52,6 @@ const AppContentManagement = () => {
         });
       }
     } catch (error) {
-      console.error('İçerik yüklenirken hata:', error);
       setMessage({ type: 'danger', text: 'İçerik yüklenirken hata oluştu.' });
     } finally {
       setLoading(false);
@@ -73,7 +72,6 @@ const AppContentManagement = () => {
       setMessage({ type: 'success', text: 'Kullanım Şartları başarıyla güncellendi!' });
       await fetchContent();
     } catch (error) {
-      console.error('İçerik güncellenirken hata:', error);
       setMessage({ type: 'danger', text: 'İçerik güncellenirken hata oluştu.' });
     } finally {
       setSaving(false);
@@ -94,7 +92,6 @@ const AppContentManagement = () => {
       setMessage({ type: 'success', text: 'Nasıl Çalışır içeriği başarıyla güncellendi!' });
       await fetchContent();
     } catch (error) {
-      console.error('İçerik güncellenirken hata:', error);
       setMessage({ type: 'danger', text: 'İçerik güncellenirken hata oluştu.' });
     } finally {
       setSaving(false);

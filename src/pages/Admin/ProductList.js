@@ -66,7 +66,6 @@ const ProductList = () => {
         setError(response.message || 'Ürünler yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('Ürünler yüklenirken hata:', error);
       setError('Ürünler yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -80,7 +79,6 @@ const ProductList = () => {
         setBrands(response.data || []);
       }
     } catch (error) {
-      console.error('Markalar yüklenirken hata:', error);
     }
   };
 
@@ -91,7 +89,6 @@ const ProductList = () => {
         setCategories(response.data || []);
       }
     } catch (error) {
-      console.error('Kategoriler yüklenirken hata:', error);
     }
   };
 
@@ -111,7 +108,6 @@ const ProductList = () => {
         setError(response.message || 'Ürün silinirken hata oluştu');
       }
     } catch (error) {
-      console.error('Ürün silinirken hata:', error);
       setError('Ürün silinirken hata oluştu');
     }
   };

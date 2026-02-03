@@ -79,7 +79,6 @@ const App = () => {
           }
         }
       } catch (error) {
-        console.error('Theme ayarları yüklenirken hata oluştu:', error);
       }
     };
 

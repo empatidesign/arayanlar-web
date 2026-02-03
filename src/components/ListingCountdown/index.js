@@ -64,7 +64,6 @@ const ListingCountdown = () => {
         setError('Veri alınamadı');
       }
     } catch (err) {
-      console.error('Kalan süre alınırken hata:', err);
       setError('Bağlantı hatası');
     } finally {
       setLoading(false);

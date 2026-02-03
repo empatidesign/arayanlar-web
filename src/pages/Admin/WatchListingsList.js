@@ -67,7 +67,6 @@ const WatchListingsList = () => {
         showAlert(response.message || 'İlanlar yüklenirken hata oluştu', 'danger');
       }
     } catch (error) {
-      console.error('İlanlar yüklenirken hata:', error);
       showAlert('İlanlar yüklenirken hata oluştu', 'danger');
     } finally {
       setLoading(false);
@@ -92,7 +91,6 @@ const WatchListingsList = () => {
         showAlert(response.message || 'İlan onaylanırken hata oluştu', 'danger');
       }
     } catch (error) {
-      console.error('İlan onaylanırken hata:', error);
       showAlert('İlan onaylanırken hata oluştu', 'danger');
     }
   };
@@ -120,7 +118,6 @@ const WatchListingsList = () => {
         showAlert(response.message || 'İlan reddedilirken hata oluştu', 'danger');
       }
     } catch (error) {
-      console.error('İlan reddedilirken hata:', error);
       showAlert('İlan reddedilirken hata oluştu', 'danger');
     } finally {
       setRejectLoading(false);
@@ -150,7 +147,6 @@ const WatchListingsList = () => {
         showAlert(response.message || 'İlan silinirken hata oluştu', 'danger');
       }
     } catch (error) {
-      console.error('İlan silinirken hata:', error);
       showAlert('İlan silinirken hata oluştu', 'danger');
     } finally {
       setDeleteLoading(false);
@@ -174,7 +170,6 @@ const WatchListingsList = () => {
         showAlert(response.message || 'İlan süresi uzatılırken hata oluştu', 'danger');
       }
     } catch (error) {
-      console.error('İlan süresi uzatılırken hata:', error);
       showAlert('İlan süresi uzatılırken hata oluştu', 'danger');
     } finally {
       setLoading(false);

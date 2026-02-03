@@ -56,7 +56,6 @@ const DistrictForm = () => {
         setError(response.message || 'İlçe bilgileri yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlçe bilgileri yüklenirken hata:', error);
       setError('İlçe bilgileri yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -105,7 +104,6 @@ const DistrictForm = () => {
         setError(response.message || 'İşlem sırasında hata oluştu');
       }
     } catch (error) {
-      console.error('İşlem sırasında hata:', error);
       setError('İşlem sırasında hata oluştu');
     } finally {
       setLoading(false);

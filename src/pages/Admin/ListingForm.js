@@ -43,7 +43,6 @@ const ListingForm = () => {
         setCategories(response.data || []);
       }
     } catch (error) {
-      console.error('Kategoriler yüklenirken hata:', error);
     }
   };
 
@@ -60,7 +59,6 @@ const ListingForm = () => {
         setError(response.message || 'İlan yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlan yüklenirken hata:', error);
       setError('İlan yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -94,7 +92,6 @@ const ListingForm = () => {
         setError(response.message || 'İlan güncellenirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlan güncellenirken hata:', error);
       setError('İlan güncellenirken hata oluştu');
     } finally {
       setLoading(false);

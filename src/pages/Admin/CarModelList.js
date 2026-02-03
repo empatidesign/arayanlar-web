@@ -77,9 +77,7 @@ const CarModelList = () => {
       });
       showAlert('Model sıralaması güncellendi');
     } catch (error) {
-      console.error('Model sıralaması güncellenirken hata:', error);
       if (error.response) {
-        console.error('Backend hata yanıtı:', error.response.status, error.response.data);
       }
       showAlert('Model sıralaması güncellenemedi', 'danger');
       setModels(previous);
@@ -97,12 +95,10 @@ const CarModelList = () => {
       
       const url = `/api/cars/models${queryParams.toString() ? `?${queryParams}` : ''}`;
       const response = await get(url);
-      console.log('Models API Response:', response);
       
       const modelsData = response.success ? response.data : response;
       setModels(Array.isArray(modelsData) ? modelsData : []);
     } catch (error) {
-      console.error('Modeller yüklenirken hata:', error);
       setModels([]);
       showAlert('Modeller yüklenirken hata oluştu', 'danger');
     } finally {
@@ -113,13 +109,11 @@ const CarModelList = () => {
   const fetchBrands = async () => {
     try {
       const response = await get('/api/cars/brands');
-      console.log('Brands API Response:', response); // Debug log
       
       // Backend'den gelen response yapısına göre data'yı al
       const brandsData = response.success ? response.data : response;
       setBrands(Array.isArray(brandsData) ? brandsData : []);
     } catch (error) {
-      console.error('Markalar yüklenirken hata:', error);
       setBrands([]);
     }
   };
@@ -174,7 +168,6 @@ const CarModelList = () => {
         throw new Error('Durum güncellenemedi');
       }
     } catch (error) {
-      console.error('Durum güncellenirken hata:', error);
       showAlert('Durum güncellenirken hata oluştu', 'danger');
     }
   };
@@ -189,7 +182,6 @@ const CarModelList = () => {
       setSelectedModel(null);
       showAlert('Model başarıyla silindi');
     } catch (error) {
-      console.error('Model silinirken hata:', error);
       showAlert('Model silinirken hata oluştu', 'danger');
     }
   };
@@ -286,6 +278,43 @@ const CarModelList = () => {
     }
   };
 
+  const moveColorUp = (index, isEdit = false) => {
+    if (index === 0) return; // Already at the top
+    
+    if (isEdit) {
+      setEditModel(prev => {
+        const newColors = [...prev.colors];
+        [newColors[index - 1], newColors[index]] = [newColors[index], newColors[index - 1]];
+        return { ...prev, colors: newColors };
+      });
+    } else {
+      setNewModel(prev => {
+        const newColors = [...prev.colors];
+        [newColors[index - 1], newColors[index]] = [newColors[index], newColors[index - 1]];
+        return { ...prev, colors: newColors };
+      });
+    }
+  };
+
+  const moveColorDown = (index, isEdit = false) => {
+    const colorsLength = isEdit ? editModel.colors.length : newModel.colors.length;
+    if (index === colorsLength - 1) return; // Already at the bottom
+
+    if (isEdit) {
+      setEditModel(prev => {
+        const newColors = [...prev.colors];
+        [newColors[index], newColors[index + 1]] = [newColors[index + 1], newColors[index]];
+        return { ...prev, colors: newColors };
+      });
+    } else {
+      setNewModel(prev => {
+        const newColors = [...prev.colors];
+        [newColors[index], newColors[index + 1]] = [newColors[index + 1], newColors[index]];
+        return { ...prev, colors: newColors };
+      });
+    }
+  };
+
   const handleAddModel = async () => {
     if (!newModel.name.trim()) {
       showAlert('Model adı gereklidir', 'danger');
@@ -350,7 +379,6 @@ const CarModelList = () => {
       setImagePreview(null);
       showAlert('Model başarıyla eklendi');
     } catch (error) {
-      console.error('Model eklenirken hata:', error);
       showAlert('Model eklenirken hata oluştu', 'danger');
     } finally {
       setAddLoading(false);
@@ -421,7 +449,6 @@ const CarModelList = () => {
       setEditImagePreview(null);
       showAlert('Model başarıyla güncellendi');
     } catch (error) {
-      console.error('Model güncellenirken hata:', error);
       showAlert('Model güncellenirken hata oluştu', 'danger');
     } finally {
       setEditLoading(false);
@@ -444,7 +471,6 @@ const CarModelList = () => {
           originalImage: color.image_url // Mevcut resim yolunu sakla
         }));
       } catch (error) {
-        console.error('Error parsing colors:', error);
         existingColors = [];
       }
     }
@@ -779,7 +805,29 @@ const CarModelList = () => {
                   {newModel.colors.map((color, index) => (
                     <div key={index} className="border p-3 mb-2 rounded">
                       <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h6 className="mb-0">Renk {index + 1}</h6>
+                        <div className="d-flex align-items-center">
+                          <h6 className="mb-0 me-3">Renk {index + 1}</h6>
+                          <div className="btn-group me-2">
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorUp(index, false)}
+                              disabled={index === 0}
+                              title="Yukarı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-up"></i>
+                            </Button>
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorDown(index, false)}
+                              disabled={index === newModel.colors.length - 1}
+                              title="Aşağı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-down"></i>
+                            </Button>
+                          </div>
+                        </div>
                         <Button 
                           color="danger" 
                           size="sm" 
@@ -996,7 +1044,29 @@ const CarModelList = () => {
                   {editModel.colors.map((color, index) => (
                     <div key={index} className="border p-3 mb-2 rounded">
                       <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h6 className="mb-0">Renk {index + 1}</h6>
+                        <div className="d-flex align-items-center">
+                          <h6 className="mb-0 me-3">Renk {index + 1}</h6>
+                          <div className="btn-group me-2">
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorUp(index, true)}
+                              disabled={index === 0}
+                              title="Yukarı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-up"></i>
+                            </Button>
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorDown(index, true)}
+                              disabled={index === editModel.colors.length - 1}
+                              title="Aşağı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-down"></i>
+                            </Button>
+                          </div>
+                        </div>
                         <Button 
                           color="danger" 
                           size="sm" 

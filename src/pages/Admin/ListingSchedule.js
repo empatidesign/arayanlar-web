@@ -68,7 +68,6 @@ const ListingSchedule = () => {
         setError('İlan verme saatleri yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('Error fetching schedules:', error);
       setError('İlan verme saatleri yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -115,7 +114,6 @@ const ListingSchedule = () => {
         setError(response.message || 'Güncelleme sırasında hata oluştu');
       }
     } catch (error) {
-      console.error('Error saving schedules:', error);
       setError('Güncelleme sırasında hata oluştu');
     } finally {
       setSaving(false);

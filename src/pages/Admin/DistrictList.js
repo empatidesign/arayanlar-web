@@ -65,7 +65,6 @@ const DistrictList = () => {
         setError(response.message || 'İlçeler yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlçeler yüklenirken hata:', error);
       setError('İlçeler yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -105,7 +104,6 @@ const DistrictList = () => {
         setDistricts(prev); // geri al
       }
     } catch (err) {
-      console.error('İlçe sıralama güncelleme hatası:', err);
       setError('Sıralama güncellenirken bir hata oluştu');
       setDistricts(prev); // geri al
     }
@@ -172,7 +170,6 @@ const DistrictList = () => {
         setError(response.message || 'İşlem sırasında hata oluştu');
       }
     } catch (error) {
-      console.error('İşlem sırasında hata:', error);
       setError('İşlem sırasında hata oluştu');
     } finally {
       setLoading(false);
@@ -197,7 +194,6 @@ const DistrictList = () => {
         setError(response.message || 'İlçe silinirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlçe silinirken hata:', error);
       setError('İlçe silinirken hata oluştu');
     } finally {
       setLoading(false);

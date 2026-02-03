@@ -30,7 +30,6 @@ function loadThemeFromLocalStorage(key, defaultValue) {
     const saved = localStorage.getItem(`theme_${key}`);
     return saved !== null ? saved : defaultValue;
   } catch (error) {
-    console.error("Error loading theme from localStorage:", error);
     return defaultValue;
   }
 }

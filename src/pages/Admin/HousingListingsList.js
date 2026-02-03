@@ -67,7 +67,6 @@ const HousingListingsList = () => {
         setError(response.message || "Konut ilanları yüklenirken hata oluştu");
       }
     } catch (error) {
-      console.error("Konut ilanları yüklenirken hata:", error);
       setError("Konut ilanları yüklenirken hata oluştu");
     } finally {
       setLoading(false);
@@ -90,7 +89,6 @@ const HousingListingsList = () => {
         setError(response.message || "İlan onaylanırken hata oluştu");
       }
     } catch (error) {
-      console.error("İlan onaylanırken hata:", error);
       setError("İlan onaylanırken hata oluştu");
     } finally {
       setLoading(false);
@@ -119,7 +117,6 @@ const HousingListingsList = () => {
         setError(response.message || "İlan reddedilirken hata oluştu");
       }
     } catch (error) {
-      console.error("İlan reddedilirken hata:", error);
       setError("İlan reddedilirken hata oluştu");
     } finally {
       setLoading(false);
@@ -145,7 +142,6 @@ const HousingListingsList = () => {
         setError(response.message || "İlan iptal edilirken hata oluştu");
       }
     } catch (error) {
-      console.error("İlan iptal edilirken hata:", error);
       setError("İlan iptal edilirken hata oluştu");
     } finally {
       setLoading(false);
@@ -168,7 +164,6 @@ const HousingListingsList = () => {
         setError(response.message || "İlan tekrar onaylanırken hata oluştu");
       }
     } catch (error) {
-      console.error("İlan tekrar onaylanırken hata:", error);
       setError("İlan tekrar onaylanırken hata oluştu");
     } finally {
       setLoading(false);
@@ -191,7 +186,6 @@ const HousingListingsList = () => {
         setError(response.message || "İlan silinirken hata oluştu");
       }
     } catch (error) {
-      console.error("İlan silinirken hata:", error);
       setError("İlan silinirken hata oluştu");
     } finally {
       setLoading(false);
@@ -214,7 +208,6 @@ const HousingListingsList = () => {
         setError(response.message || "İlan süresi uzatılırken hata oluştu");
       }
     } catch (error) {
-      console.error("İlan süresi uzatılırken hata:", error);
       setError("İlan süresi uzatılırken hata oluştu");
     } finally {
       setLoading(false);

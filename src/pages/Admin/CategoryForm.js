@@ -47,7 +47,6 @@ const CategoryForm = () => {
         }
       }
     } catch (error) {
-      console.error('Kategori yüklenirken hata:', error);
       setError('Kategori bilgileri yüklenirken hata oluştu.');
     } finally {
       setLoading(false);
@@ -171,7 +170,6 @@ const CategoryForm = () => {
         setError(result.message || 'İşlem sırasında hata oluştu.');
       }
     } catch (error) {
-      console.error('Form gönderilirken hata:', error);
       setError('İşlem sırasında hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setSubmitLoading(false);

@@ -56,7 +56,6 @@ const VersionManagement = () => {
         toastr.error('Versiyonlar yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('Fetch error:', error);
       toastr.error('Sunucu hatası');
     } finally {
       setLoading(false);
@@ -131,7 +130,6 @@ const VersionManagement = () => {
         toastr.error(data.message);
       }
     } catch (error) {
-      console.error('Submit error:', error);
       toastr.error('Sunucu hatası');
     }
   };
@@ -151,7 +149,6 @@ const VersionManagement = () => {
         toastr.error(data.message);
       }
     } catch (error) {
-      console.error('Delete error:', error);
       toastr.error('Sunucu hatası');
     }
   };

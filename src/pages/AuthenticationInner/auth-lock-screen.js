@@ -23,7 +23,6 @@ const LockScreen = () => {
       password: Yup.string().required("Please Enter Password"),
     }),
     onSubmit: (values) => {
-      console.log(values);
     }
   });
   document.title = "Lock Screen | Veltrix - React Admin & Dashboard Template";

@@ -212,7 +212,6 @@ const ReportsList = () => {
             setSelectedReport(updatedReportData.data);
           }
         } catch (error) {
-          console.error('Güncellenmiş şikayet bilgileri alınamadı:', error);
         }
       }
       
@@ -274,7 +273,6 @@ const ReportsList = () => {
       try {
         const authUser = localStorage.getItem('authUser');
         if (!authUser) {
-          console.error('Token bulunamadı');
           setChatMessages([]);
           return;
         }
@@ -283,7 +281,6 @@ const ReportsList = () => {
         const token = user.data?.token || user.token || user.accessToken;
         
         if (!token) {
-          console.error('Token bulunamadı');
           setChatMessages([]);
           return;
         }
@@ -301,11 +298,9 @@ const ReportsList = () => {
           setChatMessages(data.data || []);
         } else {
           const errorText = await response.text();
-          console.error('Chat mesajları yüklenemedi:', response.status, errorText);
           setChatMessages([]);
         }
       } catch (error) {
-        console.error('Chat mesajları yüklenirken hata:', error);
         setChatMessages([]);
       } finally {
         setLoadingChat(false);

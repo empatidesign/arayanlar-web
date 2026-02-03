@@ -49,7 +49,6 @@ const ProductForm = () => {
         setBrands(response.data || []);
       }
     } catch (error) {
-      console.error('Markalar yüklenirken hata:', error);
       setBrands([]);
     }
   };
@@ -61,7 +60,6 @@ const ProductForm = () => {
         setCategories(response.data || []);
       }
     } catch (error) {
-      console.error('Kategoriler yüklenirken hata:', error);
     }
   };
 
@@ -84,7 +82,6 @@ const ProductForm = () => {
               images: Array.isArray(color.images) ? color.images : []
             }));
           } catch (error) {
-            console.error('Renk verileri parse edilirken hata:', error);
             parsedColors = [];
           }
         }
@@ -110,7 +107,6 @@ const ProductForm = () => {
         setError(response.message || 'Ürün yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('Ürün yüklenirken hata:', error);
       setError('Ürün yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -136,7 +132,6 @@ const ProductForm = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    console.log('🖼️ Resim seçildi:', file);
     
     if (file) {
       // Dosya tipi kontrolü
@@ -147,13 +142,11 @@ const ProductForm = () => {
 
       setSelectedFile(file);
       setError('');
-      console.log('✅ Resim selectedFile state\'ine kaydedildi:', file.name);
 
       // Önizleme için URL oluştur
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
-        console.log('🔍 Resim önizlemesi oluşturuldu');
       };
       reader.readAsDataURL(file);
     }
@@ -285,9 +278,7 @@ const ProductForm = () => {
       // Ana ürün resmi
       if (selectedFile) {
         formDataToSend.append('image', selectedFile);
-        console.log('📤 Ana ürün resmi FormData\'ya eklendi:', selectedFile.name);
       } else {
-        console.log('⚠️ selectedFile boş, ana ürün resmi eklenmedi');
       }
 
       // Renk resimlerini ekle
@@ -302,13 +293,9 @@ const ProductForm = () => {
       });
 
       let response;
-      console.log('🚀 Form gönderiliyor...');
-      console.log('📋 FormData içeriği:');
       for (let [key, value] of formDataToSend.entries()) {
         if (value instanceof File) {
-          console.log(`  ${key}: ${value.name} (${value.size} bytes)`);
         } else {
-          console.log(`  ${key}: ${value}`);
         }
       }
       
@@ -318,7 +305,6 @@ const ProductForm = () => {
         response = await post('/api/products', formDataToSend);
       }
 
-      console.log('📥 Server yanıtı:', response);
 
       if (response.success) {
         setSuccess(isEdit ? 'Ürün başarıyla güncellendi!' : 'Ürün başarıyla eklendi!');
@@ -329,7 +315,6 @@ const ProductForm = () => {
         setError(response.message || 'İşlem sırasında hata oluştu');
       }
     } catch (error) {
-      console.error('Form gönderilirken hata:', error);
       setError('İşlem sırasında hata oluştu');
     } finally {
       setLoading(false);
@@ -377,7 +362,6 @@ const ProductForm = () => {
         setError(response.message || 'Marka eklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('Marka eklenirken hata:', error);
       setError('Marka eklenirken hata oluştu');
     } finally {
       setLoading(false);

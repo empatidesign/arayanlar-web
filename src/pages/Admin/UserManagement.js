@@ -88,10 +88,8 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      console.log('fetchUsers başlatılıyor...');
       
       const authUser = localStorage.getItem('authUser');
-      console.log('authUser localStorage:', authUser ? 'Mevcut' : 'Yok');
       
       if (!authUser) {
         setError('Yetkilendirme token\'ı bulunamadı');
@@ -99,11 +97,9 @@ const UserManagement = () => {
       }
       
       const user = JSON.parse(authUser);
-      console.log('Parsed user:', user);
       
       // Backend response yapısına göre token'ı data.token'dan al
       const token = user.data?.token || user.token || user.accessToken;
-      console.log('Token bulundu:', token ? 'Evet' : 'Hayır');
       
       if (!token) {
         setError('Yetkilendirme token\'ı bulunamadı');
@@ -118,9 +114,6 @@ const UserManagement = () => {
       });
 
       const apiUrl = `${API_BASE_URL}/api/admin/users?${queryParams}`;
-      console.log('API URL:', apiUrl);
-      console.log('API_BASE_URL:', API_BASE_URL);
-      console.log('Query params:', Object.fromEntries(queryParams));
 
       const response = await fetch(apiUrl, {
         headers: {
@@ -129,22 +122,13 @@ const UserManagement = () => {
         }
       });
 
-      console.log('API Response Status:', response.status);
-      console.log('API Response Headers:', response.headers);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API Error Response:', errorText);
         throw new Error(`HTTP ${response.status}: ${errorText || 'Kullanıcılar getirilemedi'}`);
       }
 
       const data = await response.json();
-      console.log('API Response Data:', data);
-      console.log('Users array:', data.data?.users);
-      console.log('Users array length:', data.data?.users ? data.data.users.length : 'undefined');
-      console.log('First user profile_image_url:', data.data?.users?.[0]?.profile_image_url);
-      console.log('First user is_banned:', data.data?.users?.[0]?.is_banned);
-      console.log('All users ban status:', data.data?.users?.map(u => ({ id: u.id, name: u.name, is_banned: u.is_banned })));
       
       setUsers(data.data?.users || []);
       setTotalPages(data.data?.pagination?.totalPages || 1);
@@ -184,7 +168,6 @@ const UserManagement = () => {
             updatedFormData.profile_image_url = uploadedImageUrl;
           }
         } catch (uploadError) {
-          console.error('Image upload failed:', uploadError);
           setError('Resim yüklenemedi, ancak diğer bilgiler güncellenecek');
         }
       }
@@ -414,7 +397,6 @@ const UserManagement = () => {
       const data = await response.json();
       return data.data?.profile_image_url || data.profile_image_url;
     } catch (error) {
-      console.error('Image upload error:', error);
       throw error;
     }
   };
@@ -534,7 +516,6 @@ const UserManagement = () => {
       const data = await response.json();
       return data.data;
     } catch (err) {
-      console.error('Ban durumu kontrol edilemedi:', err);
       return null;
     }
   };
@@ -720,13 +701,11 @@ const UserManagement = () => {
                                           display: 'block'
                                         }}
                                         onError={(e) => {
-                                          console.log('Image load error for user:', user.id, e.target.src);
                                           e.target.style.display = 'none';
                                           const fallback = e.target.parentNode.querySelector('.avatar-title');
                                           if (fallback) fallback.style.display = 'flex';
                                         }}
                                         onLoad={() => {
-                                          console.log('Image loaded successfully for user:', user.id);
                                         }}
                                       />
                                     ) : null}

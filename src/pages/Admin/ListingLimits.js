@@ -72,7 +72,6 @@ const ListingLimits = () => {
         }
       }
     } catch (error) {
-      console.error('Limit getirme hatası:', error);
     }
   };
 
@@ -88,7 +87,6 @@ const ListingLimits = () => {
         setUserCounts(data.users || []);
       }
     } catch (error) {
-      console.error('Kullanıcı sayaçları getirme hatası:', error);
     }
   };
 
@@ -104,7 +102,6 @@ const ListingLimits = () => {
         setSchedulerStatus(data);
       }
     } catch (error) {
-      console.error('Scheduler durumu getirme hatası:', error);
     }
   };
 
@@ -127,7 +124,6 @@ const ListingLimits = () => {
         showAlert('Limit güncellenirken hata oluştu!', 'danger');
       }
     } catch (error) {
-      console.error('Limit güncelleme hatası:', error);
       showAlert('Limit güncellenirken hata oluştu!', 'danger');
     } finally {
       setLoading(false);
@@ -151,7 +147,6 @@ const ListingLimits = () => {
         showAlert('Sayaçlar sıfırlanırken hata oluştu!', 'danger');
       }
     } catch (error) {
-      console.error('Sayaç sıfırlama hatası:', error);
       showAlert('Sayaçlar sıfırlanırken hata oluştu!', 'danger');
     } finally {
       setLoading(false);
@@ -177,7 +172,6 @@ const ListingLimits = () => {
         showAlert('Sayaç sıfırlanırken hata oluştu!', 'danger');
       }
     } catch (error) {
-      console.error('Kullanıcı sayacı sıfırlama hatası:', error);
       showAlert('Sayaç sıfırlanırken hata oluştu!', 'danger');
     } finally {
       setLoading(false);

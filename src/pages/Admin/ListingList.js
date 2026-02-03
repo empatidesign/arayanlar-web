@@ -75,7 +75,6 @@ const ListingList = () => {
         setError(response.message || 'İlanlar yüklenirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlanlar yüklenirken hata:', error);
       setError('İlanlar yüklenirken hata oluştu');
     } finally {
       setLoading(false);
@@ -96,7 +95,6 @@ const ListingList = () => {
         setError(response.message || 'İlan onaylanırken hata oluştu');
       }
     } catch (error) {
-      console.error('İlan onaylanırken hata:', error);
       setError('İlan onaylanırken hata oluştu');
     }
   };
@@ -120,7 +118,6 @@ const ListingList = () => {
         setError(response.message || 'İlan reddedilirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlan reddedilirken hata:', error);
       setError('İlan reddedilirken hata oluştu');
     }
   };
@@ -141,7 +138,6 @@ const ListingList = () => {
         setError(response.message || 'İlan silinirken hata oluştu');
       }
     } catch (error) {
-      console.error('İlan silinirken hata:', error);
       setError('İlan silinirken hata oluştu');
     }
   };
@@ -164,7 +160,6 @@ const ListingList = () => {
         setError(response.message || 'Toplu onaylama yapılırken hata oluştu');
       }
     } catch (error) {
-      console.error('Toplu onaylama yapılırken hata:', error);
       setError('Toplu onaylama yapılırken hata oluştu');
     }
   };

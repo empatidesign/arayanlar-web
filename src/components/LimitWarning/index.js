@@ -49,7 +49,6 @@ const LimitWarning = ({
         setShowWarning(false);
       }
     } catch (error) {
-      console.error('Limit kontrolü yapılamadı:', error);
     }
   };
 
