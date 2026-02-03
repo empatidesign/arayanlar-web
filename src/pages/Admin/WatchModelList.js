@@ -248,6 +248,26 @@ const WatchModelList = () => {
     }
   };
 
+  const moveColorUp = (index) => {
+    if (index === 0) return; // Already at the top
+    
+    setFormData(prev => {
+      const newColors = [...prev.colors];
+      [newColors[index - 1], newColors[index]] = [newColors[index], newColors[index - 1]];
+      return { ...prev, colors: newColors };
+    });
+  };
+
+  const moveColorDown = (index) => {
+    if (index === formData.colors.length - 1) return; // Already at the bottom
+
+    setFormData(prev => {
+      const newColors = [...prev.colors];
+      [newColors[index], newColors[index + 1]] = [newColors[index + 1], newColors[index]];
+      return { ...prev, colors: newColors };
+    });
+  };
+
   const handleImageChange = (e, isEdit = false) => {
     const file = e.target.files[0];
     if (file) {
@@ -799,7 +819,29 @@ const WatchModelList = () => {
                   <Card key={index} className="mb-2">
                     <CardBody>
                       <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h6 className="mb-0">Renk {index + 1}</h6>
+                        <div className="d-flex align-items-center">
+                          <h6 className="mb-0 me-3">Renk {index + 1}</h6>
+                          <div className="btn-group me-2">
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorUp(index)}
+                              disabled={index === 0}
+                              title="Yukarı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-up"></i>
+                            </Button>
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorDown(index)}
+                              disabled={index === formData.colors.length - 1}
+                              title="Aşağı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-down"></i>
+                            </Button>
+                          </div>
+                        </div>
                         <Button 
                           color="danger" 
                           size="sm" 
@@ -1015,7 +1057,29 @@ const WatchModelList = () => {
                   <Card key={index} className="mb-2">
                     <CardBody>
                       <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h6 className="mb-0">Renk {index + 1}</h6>
+                        <div className="d-flex align-items-center">
+                          <h6 className="mb-0 me-3">Renk {index + 1}</h6>
+                          <div className="btn-group me-2">
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorUp(index)}
+                              disabled={index === 0}
+                              title="Yukarı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-up"></i>
+                            </Button>
+                            <Button 
+                              color="secondary" 
+                              size="sm" 
+                              onClick={() => moveColorDown(index)}
+                              disabled={index === formData.colors.length - 1}
+                              title="Aşağı Taşı"
+                            >
+                              <i className="mdi mdi-arrow-down"></i>
+                            </Button>
+                          </div>
+                        </div>
                         <Button 
                           color="danger" 
                           size="sm" 
