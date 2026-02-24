@@ -562,12 +562,16 @@ const TransactionsManagement = () => {
               <Col md={6}>
                 <h6>İşlem Bilgileri</h6>
                 <p><strong>ID:</strong> #{selectedTransaction.id}</p>
-                <p><strong>Durum:</strong> 
+                <p><strong>Durum:</strong>
                   <Badge color={getStatusBadgeColor(selectedTransaction.status)} className="ms-2">
                     {getStatusText(selectedTransaction.status)}
                   </Badge>
                 </p>
+                {selectedTransaction.status === 'failed' && selectedTransaction.failure_reason && (
+                  <p><strong>Başarısızlık Nedeni:</strong> <span className="text-danger">{selectedTransaction.failure_reason}</span></p>
+                )}
                 <p><strong>Tutar:</strong> {formatPrice(selectedTransaction.amount)}</p>
+                <p><strong>Ödeme Ref:</strong> {selectedTransaction.payment_reference || '-'}</p>
                 <p><strong>Tarih:</strong> {formatDate(selectedTransaction.created_at)}</p>
               </Col>
               <Col md={6}>
