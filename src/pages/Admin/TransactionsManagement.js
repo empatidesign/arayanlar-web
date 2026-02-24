@@ -54,6 +54,7 @@ const TransactionsManagement = () => {
     total: 0,
     pending: 0,
     completed: 0,
+    failed: 0,
     cancelled: 0,
     refunded: 0
   });
@@ -114,7 +115,7 @@ const TransactionsManagement = () => {
       if (data.success && data.data) {
         setTransactions(data.data || []);
         setTotalPages(data.pagination?.totalPages || 1);
-        setTotalTransactions(data.pagination?.total || 0);
+        setTotalTransactions(data.pagination?.totalCount || 0);
       } else {
         setTransactions([]);
         setTotalPages(1);
@@ -130,19 +131,24 @@ const TransactionsManagement = () => {
   // İstatistikleri getir
   const fetchStats = async () => {
     try {
-      
       const response = await fetch(`${API_BASE_URL}/api/admin/transactions/stats`, {
         headers: getHeaders()
       });
 
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error('İstatistikler getirilemedi');
-      }
+      if (!response.ok) return;
 
       const data = await response.json();
-      setStats(data);
+      if (data.success && data.data?.general) {
+        const g = data.data.general;
+        setStats({
+          total: parseInt(g.total_transactions) || 0,
+          pending: parseInt(g.pending_transactions) || 0,
+          completed: parseInt(g.completed_transactions) || 0,
+          failed: parseInt(g.failed_transactions) || 0,
+          cancelled: 0,
+          refunded: 0
+        });
+      }
     } catch (err) {
     }
   };
@@ -180,6 +186,7 @@ const TransactionsManagement = () => {
     switch (status) {
       case 'completed': return 'success';
       case 'pending': return 'warning';
+      case 'failed': return 'danger';
       case 'cancelled': return 'danger';
       case 'refunded': return 'info';
       default: return 'secondary';
@@ -191,6 +198,7 @@ const TransactionsManagement = () => {
     switch (status) {
       case 'completed': return 'Tamamlandı';
       case 'pending': return 'Beklemede';
+      case 'failed': return 'Başarısız';
       case 'cancelled': return 'İptal Edildi';
       case 'refunded': return 'İade Edildi';
       default: return status;
@@ -271,8 +279,8 @@ const TransactionsManagement = () => {
                     </Col>
                     <Col md={2}>
                       <div className="text-center">
-                        <h4 className="text-danger">{stats.cancelled}</h4>
-                        <p className="text-muted mb-0">İptal Edildi</p>
+                        <h4 className="text-danger">{stats.failed}</h4>
+                        <p className="text-muted mb-0">Başarısız</p>
                       </div>
                     </Col>
                     <Col md={2}>
