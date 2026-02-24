@@ -391,6 +391,7 @@ const HousingListingsList = () => {
                         <th>Konum</th>
                         <th>Kullanıcı</th>
                         <th>Durum</th>
+                        <th>Ciddi Alıcı</th>
                         <th>Kalan Süre</th>
                         <th>Tarih</th>
                         <th>İşlemler</th>
@@ -523,6 +524,11 @@ const HousingListingsList = () => {
                               </div>
                             </td>
                             <td>{getStatusBadge(listing.display_status || listing.status)}</td>
+                            <td>
+                              {listing.has_serious_buyer_badge
+                                ? <span className="badge bg-warning text-dark">Ciddi Alıcı</span>
+                                : <span className="text-muted">-</span>}
+                            </td>
                             <td>{formatRemainingTime(listing.expires_at, listing.status)}</td>
                             <td>{formatDate(listing.created_at)}</td>
                             <td>
@@ -1196,6 +1202,14 @@ const HousingListingsList = () => {
                              <tr>
                                <td className="fw-bold">Kalan Süre:</td>
                                <td>{formatRemainingTime(selectedListing.expires_at, selectedListing.status)}</td>
+                             </tr>
+                             <tr>
+                               <td className="fw-bold">Ciddi Alıcı:</td>
+                               <td>
+                                 {selectedListing.has_serious_buyer_badge
+                                   ? <span className="badge bg-warning text-dark">Evet</span>
+                                   : <span className="text-muted">Hayır</span>}
+                               </td>
                              </tr>
                            </tbody>
                          </Table>

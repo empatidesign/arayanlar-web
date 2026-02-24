@@ -359,6 +359,7 @@ const CarListingsList = () => {
                               <th>Fiyat</th>
                               <th>Şehir</th>
                               <th>Durum</th>
+                              <th>Ciddi Alıcı</th>
                               <th>Kalan Süre</th>
                               <th>Kullanıcı</th>
                               <th>Tarih</th>
@@ -412,6 +413,11 @@ const CarListingsList = () => {
                                   </td>
                                   <td>{listing.location_city}</td>
                                   <td>{getStatusBadge(listing.display_status || listing.status)}</td>
+                                  <td>
+                                    {listing.has_serious_buyer_badge
+                                      ? <span className="badge bg-warning text-dark">Ciddi Alıcı</span>
+                                      : <span className="text-muted">-</span>}
+                                  </td>
                                   <td>{formatRemainingTime(listing.expires_at, listing.status)}</td>
                                   <td>
                                     <div>
@@ -649,6 +655,11 @@ const CarListingsList = () => {
                       <p><strong>Motor Hacmi:</strong> {selectedListing.engine_size}</p>
                       <p><strong>Şehir:</strong> {selectedListing.location_city}</p>
                       <p><strong>Durum:</strong> {getStatusBadge(selectedListing.status)}</p>
+                      <p><strong>Ciddi Alıcı:</strong>{' '}
+                        {selectedListing.has_serious_buyer_badge
+                          ? <span className="badge bg-warning text-dark">Evet</span>
+                          : <span className="text-muted">Hayır</span>}
+                      </p>
                       <p><strong>Oluşturulma:</strong> {formatDate(selectedListing.created_at)}</p>
                     </Col>
                   </Row>
