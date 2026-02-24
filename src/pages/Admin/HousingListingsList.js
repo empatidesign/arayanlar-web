@@ -23,6 +23,10 @@ const HousingListingsList = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [extendDurationModal, setExtendDurationModal] = useState(false);
   const [detailModal, setDetailModal] = useState(false);
+  // Transaction history modal
+  const [historyModal, setHistoryModal] = useState(false);
+  const [historyTransactions, setHistoryTransactions] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
@@ -241,6 +245,23 @@ const HousingListingsList = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "Belirtilmemiş";
     return new Date(dateString).toLocaleDateString("tr-TR");
+  };
+
+  const openHistoryModal = async (listing) => {
+    setSelectedListing(listing);
+    setHistoryTransactions([]);
+    setHistoryModal(true);
+    setHistoryLoading(true);
+    try {
+      const response = await get(`/api/admin/transactions/listing/${listing.id}?listingType=housing`);
+      if (response.success) {
+        setHistoryTransactions(response.data || []);
+      }
+    } catch {
+      // sessiz kal
+    } finally {
+      setHistoryLoading(false);
+    }
   };
 
   // Kalan süreyi hesapla ve formatla (expires_at alanını kullan)
@@ -546,6 +567,18 @@ const HousingListingsList = () => {
                                 </Button>
                                 <UncontrolledTooltip placement="top" target={`view-${listing.id}`}>
                                   Detayları Görüntüle
+                                </UncontrolledTooltip>
+
+                                <Button
+                                  color="secondary"
+                                  size="sm"
+                                  onClick={() => openHistoryModal(listing)}
+                                  id={`history-${listing.id}`}
+                                >
+                                  <i className="mdi mdi-history"></i>
+                                </Button>
+                                <UncontrolledTooltip placement="top" target={`history-${listing.id}`}>
+                                  İşlem Geçmişi
                                 </UncontrolledTooltip>
 
                                 {listing.status === "pending" && (
@@ -855,6 +888,66 @@ const HousingListingsList = () => {
              <Button color="danger" onClick={handleDelete} disabled={loading}>
                {loading ? "Siliniyor..." : "Sil"}
              </Button>
+           </ModalFooter>
+         </Modal>
+
+         {/* İşlem Geçmişi Modal */}
+         <Modal isOpen={historyModal} toggle={() => setHistoryModal(false)} size="lg">
+           <ModalHeader toggle={() => setHistoryModal(false)}>
+             İşlem Geçmişi — {selectedListing?.title}
+           </ModalHeader>
+           <ModalBody>
+             {historyLoading ? (
+               <div className="text-center py-4">
+                 <div className="spinner-border" role="status" />
+               </div>
+             ) : historyTransactions.length === 0 ? (
+               <div className="text-center text-muted py-4">Bu ilana ait işlem kaydı bulunamadı.</div>
+             ) : (
+               <div className="timeline-container" style={{ position: 'relative', paddingLeft: '24px' }}>
+                 <div style={{ position: 'absolute', left: '11px', top: 0, bottom: 0, width: '2px', backgroundColor: '#dee2e6' }} />
+                 {historyTransactions.map((tx, idx) => {
+                   const isCompleted = tx.status === 'completed';
+                   const isFailed = tx.status === 'failed';
+                   const dotColor = isCompleted ? '#28a745' : isFailed ? '#dc3545' : '#ffc107';
+                   const txTypeLabel = tx.transaction_type === 'premium' ? 'Ciddi Alıcı Paketi' : tx.transaction_type === 'extension' ? 'Süre Uzatma' : tx.transaction_type;
+                   const statusLabel = isCompleted ? 'Tamamlandı' : isFailed ? 'Başarısız' : tx.status === 'pending' ? 'Bekliyor' : tx.status;
+                   const statusColor = isCompleted ? 'success' : isFailed ? 'danger' : 'warning';
+                   return (
+                     <div key={tx.id} style={{ position: 'relative', marginBottom: idx < historyTransactions.length - 1 ? '24px' : 0 }}>
+                       <div style={{ position: 'absolute', left: '-20px', top: '4px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: dotColor, border: '2px solid #fff', boxShadow: '0 0 0 2px ' + dotColor }} />
+                       <div className="card border mb-0">
+                         <div className="card-body py-2 px-3">
+                           <div className="d-flex justify-content-between align-items-start">
+                             <div>
+                               <span className="fw-semibold me-2">{txTypeLabel}</span>
+                               <Badge color={statusColor}>{statusLabel}</Badge>
+                             </div>
+                             <small className="text-muted">{new Date(tx.created_at).toLocaleString('tr-TR')}</small>
+                           </div>
+                           <div className="mt-1 d-flex flex-wrap gap-3">
+                             <small><span className="text-muted">Tutar:</span> <strong>{tx.amount ? Number(tx.amount).toLocaleString('tr-TR') + ' ₺' : '-'}</strong></small>
+                             {tx.extension_days && <small><span className="text-muted">Uzatma:</span> <strong>{tx.extension_days} gün</strong></small>}
+                             {tx.old_expiry_date && <small><span className="text-muted">Eski bitiş:</span> <strong>{new Date(tx.old_expiry_date).toLocaleDateString('tr-TR')}</strong></small>}
+                             {tx.new_expiry_date && <small><span className="text-muted">Yeni bitiş:</span> <strong>{new Date(tx.new_expiry_date).toLocaleDateString('tr-TR')}</strong></small>}
+                             {tx.payment_reference && <small><span className="text-muted">Ref:</span> <strong>{tx.payment_reference}</strong></small>}
+                           </div>
+                           {tx.failure_reason && (
+                             <div className="mt-1 text-danger" style={{ fontSize: '12px' }}>
+                               <i className="mdi mdi-alert-circle me-1" />
+                               {tx.failure_reason}
+                             </div>
+                           )}
+                         </div>
+                       </div>
+                     </div>
+                   );
+                 })}
+               </div>
+             )}
+           </ModalBody>
+           <ModalFooter>
+             <Button color="secondary" onClick={() => setHistoryModal(false)}>Kapat</Button>
            </ModalFooter>
          </Modal>
 
