@@ -205,13 +205,32 @@ const TransactionsManagement = () => {
     }
   };
 
-  // Type metni
+  // Type metni (listing_type)
   const getTypeText = (type) => {
     switch (type) {
       case 'housing': return 'Konut';
       case 'car': return 'Araç';
       case 'watch': return 'Saat';
       default: return type;
+    }
+  };
+
+  // Transaction type metni
+  const getTransactionTypeText = (type) => {
+    switch (type) {
+      case 'premium': return 'Ciddi Alıcı Paketi';
+      case 'extension': return 'Süre Uzatma';
+      case 'boost': return 'Öne Çıkarma';
+      default: return type || '-';
+    }
+  };
+
+  const getTransactionTypeBadgeColor = (type) => {
+    switch (type) {
+      case 'premium': return 'warning';
+      case 'extension': return 'primary';
+      case 'boost': return 'success';
+      default: return 'secondary';
     }
   };
 
@@ -399,7 +418,8 @@ const TransactionsManagement = () => {
                               <th>ID</th>
                               <th>Kullanıcı</th>
                               <th>İlan</th>
-                              <th>Tür</th>
+                              <th>Kategori</th>
+                              <th>Ödeme Türü</th>
                               <th>Tutar</th>
                               <th>Durum</th>
                               <th>Tarih</th>
@@ -427,6 +447,11 @@ const TransactionsManagement = () => {
                                 <td>
                                   <Badge color="info" pill>
                                     {getTypeText(transaction.listing_type)}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <Badge color={getTransactionTypeBadgeColor(transaction.transaction_type)} pill>
+                                    {getTransactionTypeText(transaction.transaction_type)}
                                   </Badge>
                                 </td>
                                 <td>
@@ -585,9 +610,14 @@ const TransactionsManagement = () => {
                 <h6>İlan Bilgileri</h6>
                 <p><strong>Başlık:</strong> {selectedTransaction.listing_title}</p>
                 <p><strong>ID:</strong> {selectedTransaction.listing_id}</p>
-                <p><strong>Tür:</strong> 
+                <p><strong>Kategori:</strong>
                   <Badge color="info" className="ms-2">
                     {getTypeText(selectedTransaction.listing_type)}
+                  </Badge>
+                </p>
+                <p><strong>Ödeme Türü:</strong>
+                  <Badge color={getTransactionTypeBadgeColor(selectedTransaction.transaction_type)} className="ms-2">
+                    {getTransactionTypeText(selectedTransaction.transaction_type)}
                   </Badge>
                 </p>
               </Col>
