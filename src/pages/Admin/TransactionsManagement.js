@@ -221,7 +221,8 @@ const TransactionsManagement = () => {
       case 'premium': return 'Ciddi Alıcı Paketi';
       case 'extension': return 'Süre Uzatma';
       case 'boost': return 'Öne Çıkarma';
-      case 'deleted': return 'Silindi';
+      case 'deleted': return 'Admin Tarafından Silindi';
+      case 'user_deleted': return 'Kullanıcı Tarafından Silindi';
       default: return type || '-';
     }
   };
@@ -231,6 +232,8 @@ const TransactionsManagement = () => {
       case 'premium': return 'warning';
       case 'extension': return 'primary';
       case 'boost': return 'success';
+      case 'deleted': return 'danger';
+      case 'user_deleted': return 'danger';
       default: return 'secondary';
     }
   };

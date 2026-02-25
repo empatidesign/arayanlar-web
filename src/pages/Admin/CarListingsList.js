@@ -821,7 +821,7 @@ const CarListingsList = () => {
                     const isCompleted = tx.status === 'completed';
                     const isFailed = tx.status === 'failed';
                     const dotColor = isCompleted ? '#28a745' : isFailed ? '#dc3545' : '#ffc107';
-                    const txTypeLabel = tx.transaction_type === 'premium' ? 'Ciddi Alıcı Paketi' : tx.transaction_type === 'extension' ? 'Süre Uzatma' : tx.transaction_type === 'deleted' ? 'Admin Tarafından Silindi' : tx.transaction_type;
+                    const txTypeLabel = tx.transaction_type === 'premium' ? 'Ciddi Alıcı Paketi' : tx.transaction_type === 'extension' ? 'Süre Uzatma' : tx.transaction_type === 'deleted' ? 'Admin Tarafından Silindi' : tx.transaction_type === 'user_deleted' ? 'Kullanıcı Tarafından Silindi' : tx.transaction_type;
                     const statusLabel = isCompleted ? 'Tamamlandı' : isFailed ? 'Başarısız' : tx.status === 'pending' ? 'Bekliyor' : tx.status;
                     const statusColor = isCompleted ? 'success' : isFailed ? 'danger' : 'warning';
                     return (
