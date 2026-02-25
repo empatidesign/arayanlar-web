@@ -1,15 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { Link } from "react-router-dom";
 import { Dropdown, DropdownToggle, DropdownMenu, Row, Col } from "reactstrap";
-import SimpleBar from "simplebar-react";
-
-//i18n
+import { get } from "../../../helpers/backend_helper";
 import { withTranslation } from "react-i18next";
 
 const NotificationDropdown = props => {
-  // Declare a new state variable, which we'll call "menu"
   const [menu, setMenu] = useState(false);
+  const [counts, setCounts] = useState({ cars: 0, housing: 0, watches: 0, total: 0 });
+
+  const fetchCounts = async () => {
+    try {
+      const res = await get("/api/admin/pending-counts");
+      if (res.success) setCounts(res.data);
+    } catch (e) {
+      // sessiz hata
+    }
+  };
+
+  useEffect(() => {
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const categories = [
+    { label: "Araba İlanları", count: counts.cars, icon: "mdi mdi-car", color: "primary", path: "/admin/car-listings" },
+    { label: "Ev İlanları", count: counts.housing, icon: "mdi mdi-home", color: "success", path: "/admin/housing-listings" },
+    { label: "Saat İlanları", count: counts.watches, icon: "mdi mdi-watch", color: "warning", path: "/admin/watch-listings" },
+  ];
 
   return (
     <React.Fragment>
@@ -25,110 +44,54 @@ const NotificationDropdown = props => {
           id="page-header-notifications-dropdown"
         >
           <i className="mdi mdi-bell-outline"></i>
-          <span className="badge bg-danger rounded-pill">3</span>
+          {counts.total > 0 && (
+            <span className="badge bg-danger rounded-pill">{counts.total}</span>
+          )}
         </DropdownToggle>
 
         <DropdownMenu className="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0">
-          <div className="p-3">
+          <div className="p-3 border-bottom">
             <Row className="align-items-center">
               <Col>
-                <h6 className="m-0 font-size-16"> {props.t("Notifications")} (258)</h6>
+                <h6 className="m-0 font-size-16">Onay Bekleyen İlanlar</h6>
               </Col>
+              {counts.total > 0 && (
+                <Col className="col-auto">
+                  <span className="badge bg-danger">{counts.total} bekliyor</span>
+                </Col>
+              )}
             </Row>
           </div>
 
-          <SimpleBar style={{ height: "230px" }}>
-            <Link to="#" className="text-reset notification-item">
-              <div className="d-flex">
-                <div className="avatar-xs me-3">
-                  <span className="avatar-title bg-success rounded-circle font-size-16">
-                    <i className="mdi mdi-cart-outline"></i>
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h6 className="mt-0 mb-1">Your order is placed</h6>
-                  <div className="font-size-12 text-muted">
-                    <p className="mb-1">
-                      Dummy text of the printing and typesetting industry.
-                    </p>
-                  </div>
-                </div>
+          <div className="p-2">
+            {counts.total === 0 ? (
+              <div className="text-center py-3 text-muted">
+                <i className="mdi mdi-check-circle font-size-24 d-block mb-1"></i>
+                <span className="font-size-13">Bekleyen ilan yok</span>
               </div>
-            </Link>
-            <Link to="#" className="text-reset notification-item">
-              <div className="d-flex">
-                <div className="avatar-xs me-3">
-                  <span className="avatar-title bg-warning rounded-circle font-size-16">
-                    <i className="mdi mdi-message-text-outline"></i>
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h6 className="mt-0 mb-1">New Message received</h6>
-                  <div className="font-size-12 text-muted">
-                    <p className="mb-1">You have 87 unread messages</p>
+            ) : (
+              categories.map(cat => cat.count > 0 && (
+                <Link
+                  key={cat.path}
+                  to={`${cat.path}?status=pending`}
+                  className="text-reset notification-item"
+                  onClick={() => setMenu(false)}
+                >
+                  <div className="d-flex align-items-center p-2">
+                    <div className="avatar-xs me-3 flex-shrink-0">
+                      <span className={`avatar-title bg-${cat.color} rounded-circle font-size-16`}>
+                        <i className={cat.icon}></i>
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <h6 className="mt-0 mb-0">{cat.label}</h6>
+                      <span className="font-size-12 text-muted">{cat.count} ilan onay bekliyor</span>
+                    </div>
+                    <span className={`badge bg-${cat.color} ms-2`}>{cat.count}</span>
                   </div>
-                </div>
-              </div>
-            </Link>
-            <Link to="#" className="text-reset notification-item">
-              <div className="d-flex">
-                <div className="avatar-xs me-3">
-                  <span className="avatar-title bg-info rounded-circle font-size-16">
-                    <i className="mdi mdi-glass-cocktail"></i>
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h6 className="mt-0 mb-1">Your item is shipped</h6>
-                  <div className="font-size-12 text-muted">
-                    <p className="mb-1">
-                      It is a long established fact that a reader will
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-            <Link to="#" className="text-reset notification-item">
-              <div className="d-flex">
-                <div className="avatar-xs me-3">
-                  <span className="avatar-title bg-primary rounded-circle font-size-16">
-                    <i className="mdi mdi-cart-outline"></i>
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h6 className="mt-0 mb-1">Your order is placed</h6>
-                  <div className="font-size-12 text-muted">
-                    <p className="mb-1">
-                      Dummy text of the printing and typesetting industry.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-            <Link to="#" className="text-reset notification-item">
-              <div className="d-flex">
-                <div className="avatar-xs me-3">
-                  <span className="avatar-title bg-danger rounded-circle font-size-16">
-                    <i className="mdi mdi-message-text-outline"></i>
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h6 className="mt-0 mb-1">New Message received</h6>
-                  <div className="font-size-12 text-muted">
-                    <p className="mb-1">You have 87 unread messages</p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </SimpleBar>
-          <div className="p-2 border-top d-grid">
-            <Link
-              className="btn btn-sm btn-link font-size-14 btn-block text-center"
-              to="#"
-            >
-              <i className="mdi mdi-arrow-right-circle me-1"></i>
-              {" "}
-              {props.t("View all")}{" "}
-            </Link>
+                </Link>
+              ))
+            )}
           </div>
         </DropdownMenu>
       </Dropdown>
@@ -136,8 +99,8 @@ const NotificationDropdown = props => {
   );
 };
 
-export default withTranslation()(NotificationDropdown);
-
 NotificationDropdown.propTypes = {
   t: PropTypes.any
 };
+
+export default withTranslation()(NotificationDropdown);

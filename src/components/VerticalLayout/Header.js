@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 // Import menuDropdown
 import LanguageDropdown from "../CommonForBoth/TopbarDropdown/LanguageDropdown";
 import ProfileMenu from "../CommonForBoth/TopbarDropdown/ProfileMenu";
+import NotificationDropdown from "../CommonForBoth/TopbarDropdown/NotificationDropdown";
 
 import logodarkImg from "../../assets/images/logo-dark.png";
 import logosmImg from "../../assets/images/logo-sm.png";
@@ -162,6 +163,7 @@ const Header = props => {
               </button>
             </div>
 
+            <NotificationDropdown />
             <ProfileMenu />
 
             <div

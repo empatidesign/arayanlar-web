@@ -13,6 +13,7 @@ import { Row, Col, Dropdown, DropdownToggle, DropdownMenu,DropdownItem } from "r
 // Import menuDropdown
 import LanguageDropdown from "../CommonForBoth/TopbarDropdown/LanguageDropdown"
 import ProfileMenu from "../CommonForBoth/TopbarDropdown/ProfileMenu"
+import NotificationDropdown from "../CommonForBoth/TopbarDropdown/NotificationDropdown"
 
 //i18n
 import { withTranslation } from "react-i18next"
@@ -102,7 +103,8 @@ const Header = props => {
                     <i className="mdi mdi-fullscreen"></i>
                 </button>
             </div>
-            <ProfileMenu />        
+            <NotificationDropdown />
+            <ProfileMenu />
             <div className="dropdown d-inline-block">
                 <button
                   onClick={() => {
