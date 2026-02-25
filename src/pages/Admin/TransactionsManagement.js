@@ -221,6 +221,7 @@ const TransactionsManagement = () => {
       case 'premium': return 'Ciddi Alıcı Paketi';
       case 'extension': return 'Süre Uzatma';
       case 'boost': return 'Öne Çıkarma';
+      case 'deleted': return 'Silindi';
       default: return type || '-';
     }
   };
